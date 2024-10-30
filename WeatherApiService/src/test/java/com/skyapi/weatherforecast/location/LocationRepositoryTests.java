@@ -49,4 +49,23 @@ public class LocationRepositoryTests {
         assertThat(unTrashedLocations.size()).isGreaterThan(0);
     }
 
+    @Test
+    public void testFindByCodeShouldReturnLocationWhenExists() {
+        Location foundLocation = locationRepository.findByCode("LOC001");
+
+        // Kiểm tra kết quả
+        assertThat(foundLocation).isNotNull();
+        assertThat(foundLocation.getCode()).isEqualTo("LOC001");
+        assertThat(foundLocation.getCityName()).isEqualTo("Hanoi");
+    }
+
+    @Test
+    public void testFindByCodeShouldReturnNullWhenCodeDoesNotExist() {
+        // Gọi phương thức findByCode với code không tồn tại
+        Location foundLocation = locationRepository.findByCode("NON_EXISTENT");
+
+        // Kiểm tra kết quả là null
+        assertThat(foundLocation).isNull();
+    }
+
 }

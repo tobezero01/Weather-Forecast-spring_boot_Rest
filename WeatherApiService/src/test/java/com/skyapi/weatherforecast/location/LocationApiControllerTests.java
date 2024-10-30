@@ -15,13 +15,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(LocationApiController.class)
 public class LocationApiControllerTests {
@@ -87,7 +86,7 @@ public class LocationApiControllerTests {
         Mockito.when(locationService.list()).thenReturn(locations);
 
         // Thực hiện yêu cầu GET và kiểm tra kết quả
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/locations")
+        mockMvc.perform(get("/v1/locations")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())  // Kiểm tra mã trạng thái là 200 OK
                 .andExpect(jsonPath("$.length()").value(2))  // Kiểm tra có 2 phần tử trong danh sách
@@ -102,9 +101,46 @@ public class LocationApiControllerTests {
         Mockito.when(locationService.list()).thenReturn(Collections.emptyList());
 
         // Thực hiện yêu cầu GET và kiểm tra kết quả
-        mockMvc.perform(MockMvcRequestBuilders.get("/v1/locations")
+        mockMvc.perform(get("/v1/locations")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())  // Kiểm tra mã trạng thái là 204 No Content
                 .andDo(print());
     }
+
+
+    @Test
+    public void testGetLocationByCode_ShouldReturn200WhenFound() throws Exception {
+        // Tạo dữ liệu giả cho location
+        Location location = new Location();
+        location.setCode("LOC001");
+        location.setCityName("Hanoi");
+        location.setRegionName("Red River Delta");
+        location.setCountryName("Vietnam");
+        location.setCountryCode("VN");
+        location.setEnabled(true);
+        location.setTrashed(false);
+
+        // Giả lập behavior của locationService
+        when(locationService.get("LOC001")).thenReturn(location);
+
+        mockMvc.perform(get("/v1/locations/LOC001")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()) // Kiểm tra mã trạng thái là 200 OK
+                .andExpect(jsonPath("$.code").value("LOC001")) // Kiểm tra code
+                .andExpect(jsonPath("$.cityName").value("Hanoi")) // Kiểm tra cityName
+                .andDo(print()); // In response ra console
+    }
+
+    @Test
+    public void testGetLocationByCode_ShouldReturn404WhenNotFound() throws Exception {
+        // Giả lập behavior trả về null nếu không tìm thấy location
+        when(locationService.get("INVALID_CODE")).thenReturn(null);
+
+        // Thực hiện GET request với mã code không tồn tại
+        mockMvc.perform(get("/v1/locations/INVALID_CODE")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound()) // Kiểm tra mã trạng thái là 404 Not Found
+                .andDo(print()); // In response ra console
+    }
+
 }

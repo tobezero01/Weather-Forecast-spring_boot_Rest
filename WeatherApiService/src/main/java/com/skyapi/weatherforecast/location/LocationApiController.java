@@ -58,4 +58,14 @@ public class LocationApiController {
         }
         return ResponseEntity.ok(locations);
     }
+
+    @GetMapping("/{code}")
+    public ResponseEntity<Location> getLocationByCode(@PathVariable String code) {
+        Location location = locationService.get(code);
+
+        if (location == null) {
+            return ResponseEntity.notFound().build(); // 404 nếu không tìm thấy
+        }
+        return ResponseEntity.ok(location); // 200 nếu tìm thấy
+    }
 }
