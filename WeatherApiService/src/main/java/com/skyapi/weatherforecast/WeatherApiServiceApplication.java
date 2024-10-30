@@ -15,6 +15,7 @@ public class WeatherApiServiceApplication {
 	@Bean
 	CommandLineRunner  commandLineRunner() {
 		return runner -> {
+			System.out.println("Welcome");
 			System.out.println("Service started ...");
 		};
 	}
