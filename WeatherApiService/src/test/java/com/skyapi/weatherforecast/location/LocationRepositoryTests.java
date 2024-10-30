@@ -7,6 +7,8 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.*;
 
 @DataJpaTest
@@ -35,6 +37,16 @@ public class LocationRepositoryTests {
         assertThat(savedLocation).isNotNull();
         assertThat(savedLocation.getCode()).isEqualTo("NYC123");
         assertThat(savedLocation.getCityName()).isEqualTo("New York");
+    }
+
+    @Test
+    public void testFindUnTrashed() {
+        List<Location> unTrashedLocations = locationRepository.findUnTrashed();
+        for (Location l : unTrashedLocations) {
+            System.out.println(l);
+        }
+        // Kiểm tra kết quả
+        assertThat(unTrashedLocations.size()).isGreaterThan(0);
     }
 
 }

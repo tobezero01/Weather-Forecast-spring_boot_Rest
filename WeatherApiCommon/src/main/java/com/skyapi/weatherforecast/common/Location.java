@@ -41,6 +41,21 @@ public class Location {
     public Location() {
     }
 
+    public Location(String code, String cityName) {
+        this.code = code;
+        this.cityName = cityName;
+    }
+
+    public Location(String code, String cityName, String regionName, String countryName, String countryCode, boolean enabled, boolean trashed) {
+        this.code = code;
+        this.cityName = cityName;
+        this.regionName = regionName;
+        this.countryName = countryName;
+        this.countryCode = countryCode;
+        this.enabled = enabled;
+        this.trashed = trashed;
+    }
+
     public Location(String code) {
         this.code = code;
     }
@@ -126,4 +141,6 @@ public class Location {
     public int hashCode() {
         return getCode().hashCode();
     }
+
+
 }

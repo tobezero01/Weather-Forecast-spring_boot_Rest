@@ -4,6 +4,8 @@ import com.skyapi.weatherforecast.common.Location;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class LocationService {
@@ -19,6 +21,9 @@ public class LocationService {
     }
     public boolean existsByCode(String code) {
         return locationRepository.existsById(code); // Hoặc sử dụng cách khác để kiểm tra mã địa điểm
+    }
+    public List<Location> list() {
+        return locationRepository.findUnTrashed();
     }
 
 }
