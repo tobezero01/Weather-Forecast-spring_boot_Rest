@@ -3,39 +3,47 @@ package com.skyapi.weatherforecast.common;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 @Entity
 @Table(name = "locations")
 public class Location {
+
     @Id
     @Column(length = 12, nullable = false, unique = true)
-    @NotBlank
+    @NotBlank(message = "Code is required and cannot be blank")
+    @Size(max = 12, message = "Code cannot be longer than 12 characters")
     private String code;
 
     @Column(length = 128, nullable = false)
-    @NotBlank
+    @NotBlank(message = "City name is required and cannot be blank")
+    @Size(max = 128, message = "City name cannot be longer than 128 characters")
     @JsonProperty("city_name")
     private String cityName;
 
     @Column(length = 128)
+    @NotNull(message = "Region name cannot be null")
+    @Size(max = 128, message = "Region name cannot be longer than 128 characters")
     @JsonProperty("region_name")
-    @NotNull
     private String regionName;
 
     @Column(length = 64, nullable = false)
-    @NotBlank
+    @NotBlank(message = "Country name is required and cannot be blank")
+    @Size(max = 64, message = "Country name cannot be longer than 64 characters")
     @JsonProperty("country_name")
     private String countryName;
 
     @Column(length = 2, nullable = false)
-    @NotBlank
+    @NotBlank(message = "Country code is required and cannot be blank")
+    @Size(min = 2, max = 3, message = "Country code must be exactly 2 or 3 characters")
     @JsonProperty("country_code")
     private String countryCode;
 
     private boolean enabled;
 
-    @JsonIgnore // Không ánh xạ thuộc tính này sang JSON
+    @JsonIgnore
     private boolean trashed;
 
     public Location() {

@@ -89,7 +89,7 @@ public class LocationApiControllerTests {
         // Thực hiện yêu cầu GET và kiểm tra kết quả
         mockMvc.perform(get("/v1/locations")
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())  // Kiểm tra mã trạng thái là 200 OK
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.length()").value(2))  // Kiểm tra có 2 phần tử trong danh sách
                 .andExpect(jsonPath("$[0].code").value("LOC001"))  // Kiểm tra mã của phần tử đầu tiên
                 .andExpect(jsonPath("$[1].code").value("LOC002"))  // Kiểm tra mã của phần tử thứ hai
@@ -212,5 +212,178 @@ public class LocationApiControllerTests {
                 .andExpect(status().isNotFound())
                 .andDo(print());
     }
+
+
+    // TEst validation
+    @Test
+    public void testAddShouldReturn400ForBlankCode() throws Exception {
+        Location location = new Location();
+        location.setCode(""); // Blank code, should trigger validation error
+        location.setCityName("Hanoi");
+        location.setRegionName("Red River Delta");
+        location.setCountryName("Vietnam");
+        location.setCountryCode("VN");
+
+        String bodyContent = mapper.writeValueAsString(location);
+
+        when(locationService.existsByCode(anyString())).thenReturn(false);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.errors").value("Code is required and cannot be blank"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testAddShouldReturn400ForBlankCityName() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC001");
+        location.setCityName(""); // Blank city name
+        location.setRegionName("Red River Delta");
+        location.setCountryName("Vietnam");
+        location.setCountryCode("VN");
+
+        String bodyContent = mapper.writeValueAsString(location);
+
+        when(locationService.existsByCode(anyString())).thenReturn(false);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("City name is required and cannot be blank"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testAddShouldReturn400ForNullRegionName() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC002");
+        location.setCityName("Ho Chi Minh City");
+        location.setRegionName(null); // Null region name, should trigger validation error
+        location.setCountryName("Vietnam");
+        location.setCountryCode("VN");
+
+        String bodyContent = mapper.writeValueAsString(location);
+
+        when(locationService.existsByCode(anyString())).thenReturn(false);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("Region name cannot be null"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testAddShouldReturn400ForBlankCountryName() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC003");
+        location.setCityName("Hue");
+        location.setRegionName("Central");
+        location.setCountryName(""); // Blank country name
+        location.setCountryCode("VN");
+
+        String bodyContent = mapper.writeValueAsString(location);
+
+        when(locationService.existsByCode(anyString())).thenReturn(false);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("Country name is required and cannot be blank"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testAddShouldReturn400ForBlankCountryCode() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC004");
+        location.setCityName("Da Nang");
+        location.setRegionName("Central Coast");
+        location.setCountryName("Vietnam");
+        location.setCountryCode(""); // Blank country code
+
+        String bodyContent = mapper.writeValueAsString(location);
+
+        when(locationService.existsByCode(anyString())).thenReturn(false);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("Country code is required and cannot be blank"))
+                .andDo(print());
+    }
+
+
+    @Test
+    public void testAddShouldReturn400ForLongCode() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC1234567890"); // Exceeds 12 characters
+        location.setCityName("Hanoi");
+        location.setRegionName("Red River Delta");
+        location.setCountryName("Vietnam");
+        location.setCountryCode("VN");
+
+        String bodyContent = mapper.writeValueAsString(location);
+
+        when(locationService.existsByCode(anyString())).thenReturn(false);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("Code cannot be longer than 12 characters"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testAddShouldReturn400ForLongCityName() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC001");
+        location.setCityName("A very long city name that exceeds the maximum allowed 128 characters for the field validation to trigger in the test case setup.");
+        location.setRegionName("Red River Delta");
+        location.setCountryName("Vietnam");
+        location.setCountryCode("VN");
+
+        String bodyContent = mapper.writeValueAsString(location);
+
+        when(locationService.existsByCode(anyString())).thenReturn(false);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("City name cannot be longer than 128 characters"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testAddShouldReturn400ForInvalidCountryCodeLength() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC003");
+        location.setCityName("Hue");
+        location.setRegionName("Central");
+        location.setCountryName("Vietnam");
+        location.setCountryCode("VN12"); // Exceeds 2 characters
+
+        String bodyContent = mapper.writeValueAsString(location);
+
+        when(locationService.existsByCode(anyString())).thenReturn(false);
+
+        mockMvc.perform(post(END_POINT_PATH)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyContent))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors").value("Country code must be exactly 2 or 3 characters"))
+                .andDo(print());
+    }
+
 
 }

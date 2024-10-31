@@ -1,15 +1,15 @@
 package com.skyapi.weatherforecast.exception.custom;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class ErrorDTO {
     private Date timestamp;
-    private String error;
+    private List<String> errors = new ArrayList<>();
     private int status;
     private String path;
-    private String message;
 
-    // Getters and setters
     public Date getTimestamp() {
         return timestamp;
     }
@@ -18,12 +18,12 @@ public class ErrorDTO {
         this.timestamp = timestamp;
     }
 
-    public String getError() {
-        return error;
+    public List<String> getErrors() {
+        return errors;
     }
 
-    public void setError(String error) {
-        this.error = error;
+    public void setErrors(List<String> errors) {
+        this.errors = errors;
     }
 
     public int getStatus() {
@@ -42,11 +42,7 @@ public class ErrorDTO {
         this.path = path;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
+    public void addError(String errorMessage) {
+        this.errors.add(errorMessage);
     }
 }
