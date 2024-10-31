@@ -381,9 +381,8 @@ public class LocationApiControllerTests {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bodyContent))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errors").value("Country code must be exactly 2 or 3 characters"))
+                .andExpect(jsonPath("$.errors").value("Country code must be exactly 2 ỏ  characters"))
                 .andDo(print());
     }
-
 
 }

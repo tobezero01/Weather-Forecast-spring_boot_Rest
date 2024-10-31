@@ -1,12 +1,14 @@
 package com.skyapi.weatherforecast.location;
 
 import com.skyapi.weatherforecast.common.Location;
+import com.skyapi.weatherforecast.common.RealtimeWeather;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.Date;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
@@ -67,5 +69,41 @@ public class LocationRepositoryTests {
         // Kiểm tra kết quả là null
         assertThat(foundLocation).isNull();
     }
+
+    @Test
+    public void addRealtimeWeatherData() {
+        String code = "LOC001"; // The location code to be tested
+        Location location = locationRepository.findByCode(code);
+
+        // Check if the location exists
+        assertThat(location).isNotNull();
+
+        // Get existing realtime weather or create a new one
+        RealtimeWeather realtimeWeather = location.getRealtimeWeather();
+
+        if (realtimeWeather == null) {
+            realtimeWeather = new RealtimeWeather();
+            realtimeWeather.setLocation(location);
+            location.setRealtimeWeather(realtimeWeather); // Associate the new realtimeWeather with the location
+        }
+
+        // Update the realtime weather data
+        realtimeWeather.setTemperature(25);
+        realtimeWeather.setHumidity(70);
+        realtimeWeather.setPrecipitation(0);
+        realtimeWeather.setWindSpeed(15);
+        realtimeWeather.setStatus("Clear");
+        realtimeWeather.setLastUpdated(new Date());
+
+        // Save the updated location, which should cascade the update to RealtimeWeather
+        Location updatedLocation = locationRepository.save(location);
+
+        // Assertions to verify the update was successful
+        assertThat(updatedLocation.getRealtimeWeather()).isNotNull();
+        assertThat(updatedLocation.getRealtimeWeather().getTemperature()).isEqualTo(25);
+        assertThat(updatedLocation.getRealtimeWeather().getHumidity()).isEqualTo(70);
+        assertThat(updatedLocation.getRealtimeWeather().getStatus()).isEqualTo("Clear");
+    }
+
 
 }

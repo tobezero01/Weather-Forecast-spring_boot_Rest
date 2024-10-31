@@ -46,6 +46,10 @@ public class Location {
     @JsonIgnore
     private boolean trashed;
 
+    @OneToOne(mappedBy = "location", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    private RealtimeWeather realtimeWeather;
+
     public Location() {
     }
 
@@ -122,6 +126,14 @@ public class Location {
 
     public void setTrashed(boolean trashed) {
         this.trashed = trashed;
+    }
+
+    public RealtimeWeather getRealtimeWeather() {
+        return realtimeWeather;
+    }
+
+    public void setRealtimeWeather(RealtimeWeather realtimeWeather) {
+        this.realtimeWeather = realtimeWeather;
     }
 
     @Override
