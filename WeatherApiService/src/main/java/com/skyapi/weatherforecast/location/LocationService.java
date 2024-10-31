@@ -1,6 +1,7 @@
 package com.skyapi.weatherforecast.location;
 
 import com.skyapi.weatherforecast.common.Location;
+import com.skyapi.weatherforecast.exception.LocationNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,4 +31,28 @@ public class LocationService {
         return locationRepository.findByCode(code);
     }
 
+    public Location update(Location locationInRequest) throws LocationNotFoundException {
+        String code = locationInRequest.getCode();
+
+        Location locationInDB = locationRepository.findByCode(code);
+
+        if (locationInDB == null) {
+            throw new LocationNotFoundException("No location found with the given code :" + code);
+        }
+
+        locationInDB.setCityName(locationInRequest.getCityName());
+        locationInDB.setRegionName(locationInRequest.getRegionName());
+        locationInDB.setCountryName(locationInRequest.getCountryName());
+        locationInDB.setCountryCode(locationInRequest.getCountryCode());
+        locationInDB.setEnabled(locationInRequest.isEnabled());
+
+        return locationRepository.save(locationInDB);
+    }
+
+    public void trashByCode(String code) throws LocationNotFoundException {
+        if (!locationRepository.existsById(code)) {
+            throw new LocationNotFoundException("No location found with the given code: " + code);
+        }
+        locationRepository.trashByCode(code);
+    }
 }

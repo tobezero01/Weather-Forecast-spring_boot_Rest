@@ -2,6 +2,7 @@ package com.skyapi.weatherforecast.location;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skyapi.weatherforecast.common.Location;
+import com.skyapi.weatherforecast.exception.LocationNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(LocationApiController.class)
 public class LocationApiControllerTests {
@@ -110,7 +111,6 @@ public class LocationApiControllerTests {
 
     @Test
     public void testGetLocationByCode_ShouldReturn200WhenFound() throws Exception {
-        // Tạo dữ liệu giả cho location
         Location location = new Location();
         location.setCode("LOC001");
         location.setCityName("Hanoi");
@@ -120,7 +120,6 @@ public class LocationApiControllerTests {
         location.setEnabled(true);
         location.setTrashed(false);
 
-        // Giả lập behavior của locationService
         when(locationService.get("LOC001")).thenReturn(location);
 
         mockMvc.perform(get("/v1/locations/LOC001")
@@ -133,14 +132,85 @@ public class LocationApiControllerTests {
 
     @Test
     public void testGetLocationByCode_ShouldReturn404WhenNotFound() throws Exception {
-        // Giả lập behavior trả về null nếu không tìm thấy location
         when(locationService.get("INVALID_CODE")).thenReturn(null);
 
-        // Thực hiện GET request với mã code không tồn tại
         mockMvc.perform(get("/v1/locations/INVALID_CODE")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound()) // Kiểm tra mã trạng thái là 404 Not Found
                 .andDo(print()); // In response ra console
+    }
+
+
+    @Test
+    public void testUpdateLocation_ShouldReturn200WhenSuccessful() throws Exception {
+        Location locationInDB = new Location();
+        locationInDB.setCode("LOC001");
+        locationInDB.setCityName("Hanoi");
+        locationInDB.setRegionName("Red River Delta");
+        locationInDB.setCountryName("Vietnam");
+        locationInDB.setCountryCode("VN");
+        locationInDB.setEnabled(true);
+
+        Location locationRequest = new Location();
+        locationRequest.setCityName("Ho Chi Minh City");
+        locationRequest.setRegionName("South");
+        locationRequest.setCountryName("Vietnam");
+        locationRequest.setCountryCode("VN");
+        locationRequest.setEnabled(false);
+
+        when(locationService.update(any(Location.class))).thenReturn(locationRequest);
+
+        String requestBody = mapper.writeValueAsString(locationRequest);
+
+        mockMvc.perform(put("/v1/locations/LOC001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.cityName").value("Ho Chi Minh City"))
+                .andExpect(jsonPath("$.regionName").value("South"))
+                .andExpect(jsonPath("$.enabled").value(false))
+                .andDo(print());
+    }
+
+    @Test
+    public void testUpdateLocation_ShouldReturn404WhenNotFound() throws Exception {
+        doThrow(new LocationNotFoundException("No location found with the given code: LOC999"))
+                .when(locationService).update(any(Location.class));
+        Location locationRequest = new Location();
+        locationRequest.setCityName("Unknown City");
+
+        String requestBody = mapper.writeValueAsString(locationRequest);
+        mockMvc.perform(put("/v1/locations/LOC999")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
+    @Test
+    public void testTrashLocation_ShouldReturn204WhenSuccessful() throws Exception {
+        Location locationInDB = new Location();
+        locationInDB.setCode("LOC001");
+        locationInDB.setCityName("Hanoi");
+        locationInDB.setRegionName("Red River Delta");
+        locationInDB.setCountryName("Vietnam");
+        locationInDB.setCountryCode("VN");
+        locationInDB.setEnabled(true);
+
+        mockMvc.perform(delete("/v1/locations/LOC001"))
+                .andExpect(status().isNoContent())
+                .andDo(print());
+
+        verify(locationService, times(1)).trashByCode("LOC001");
+    }
+    @Test
+    public void testTrashLocation_ShouldReturn404WhenNotFound() throws Exception {
+        doThrow(new LocationNotFoundException("No location found with the given code: LOC999"))
+                .when(locationService).trashByCode("LOC999");
+
+        mockMvc.perform(delete("/v1/locations/LOC999/trash"))
+                .andExpect(status().isNotFound())
+                .andDo(print());
     }
 
 }
