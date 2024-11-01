@@ -1,0 +1,418 @@
+openapi: 3.0.3
+info:
+  title: Swagger Weather Forecast - OpenAPI 3.0
+  description: >-
+    Reference Design documentation of Weather Forecast APIs based on OpenAPI 3.0.
+    Visit source: https://github.com/tobezero01/Weather-Forecast-spring_boot_Rest.git
+  termsOfService: http://skyweather.net/terms
+  contact:
+    email: contact@skyweather.net
+    name: Contact SkyWeather Inc.
+    url: https://skyweather.net/contacts
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.11
+externalDocs:
+  description: ISO 3166 - Country Codes
+  url: http://www.iso.org/iso-3166-country-codes.html
+  
+servers:
+  - url: http://localhost:8080
+    description: Local testing server
+    
+tags:
+  - name: Location
+    description: APIs for location management for administrative purposes.
+  - name: Realtime Weather
+    description: APIs for retrieving and updating real-time weather data.
+  - name: Hourly Forecast
+    description: APIs for retrieving and updating hourly weather forecasts.
+  - name: Daily Forecast
+    description: APIs for retrieving and updating daily weather forecasts.
+  - name: Full Weather Forecast
+    description: APIs for retrieving and updating complete weather forecasts.
+
+paths:
+  /v1/locations:
+    get:
+      summary: Return a list of managed locations available for weather forecast
+      tags: [Location]
+      responses:
+        '200':
+          description: List of available locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Location'
+        '204':
+          description: No locations found
+    post:
+      summary: Add a new location for weather forecast
+      tags: [Location]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+      responses:
+        '201':
+          description: Location added successfully
+        '400':
+          description: Invalid input
+    put:
+      summary: Update an existing location
+      tags: [Location]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+      responses:
+        '200':
+          description: Location updated successfully
+        '404':
+          description: Location not found
+
+  /v1/locations/{code}:
+    get:
+      summary: Return details of a specific location by code
+      tags: [Location]
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Location details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+        '404':
+          description: Location not found
+    delete:
+      summary: Remove an existing location
+      tags: [Location]
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Location removed successfully
+        '404':
+          description: Location not found
+
+
+
+  /v1/realtime:
+    get:
+      summary: Return current weather information based on client's IP address
+      tags: [Realtime Weather]
+      responses:
+        '200':
+          description: Current weather data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealtimeWeather'
+        '204':
+          description: No weather data available
+  /v1/realtime/{code}:
+    parameters:
+      - in: path
+        name: code
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Return current weather for a specific location by code
+      tags: [Realtime Weather]
+      responses:
+        '200':
+          description: Current weather data for the specified location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RealtimeWeather'
+        '404':
+          description: Location not found
+    put:
+      summary: Update real-time weather data for a location
+      tags: [Realtime Weather]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RealtimeWeather'
+      responses:
+        '200':
+          description: Weather data updated successfully
+        '404':
+          description: Location not found
+
+
+
+          
+  /v1/hourly:
+    get:
+      summary: Return hourly weather forecast based on client's IP address
+      tags: [Hourly Forecast]
+      responses:
+        '200':
+          description: Hourly forecast data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HourlyWeather'
+        '204':
+          description: No forecast data available
+  /v1/hourly/{code}:
+    parameters:
+      - in: path
+        name: code
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Return hourly weather forecast by location code
+      tags: [Hourly Forecast]
+      responses:
+        '200':
+          description: Hourly forecast data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HourlyWeather'
+        '404':
+          description: Location not found
+    put:
+      summary: Update hourly weather forecast for a location
+      tags: [Hourly Forecast]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HourlyWeather'
+      responses:
+        '200':
+          description: Forecast updated successfully
+        '404':
+          description: Location not found
+
+          
+          
+  /v1/daily:
+    get:
+      summary: Return daily weather information based on client's IP address
+      tags: [Daily Forecast]
+      responses:
+        '200':
+          description: Daily weather data for the location based on IP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyWeather'
+        '204':
+          description: No forecast data available
+        '404':
+          description: Location not found
+  /v1/daily/{code}:
+    parameters:
+      - in: path
+        name: code
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Return daily weather forecast information for a special location code
+      tags: [Daily Forecast]
+      responses:
+        '200':
+          description: Daily forecast data for the specified location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyWeather'
+        '204':
+          description: No forecast data available
+        '404':
+          description: Location not found
+    put:
+      summary: Update daily weather forecast information for a special location by given code
+      tags: [Daily Forecast]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DailyWeather'
+      responses:
+        '200':
+          description: Daily forecast data updated successfully
+        '400':
+          description: Bad request, invalid data provided
+        '404':
+          description: Location not found
+
+
+
+
+  /v1/full:
+    get:
+      summary: Return full weather forecast information based on client's IP address
+      tags: [Full Weather Forecast]
+      responses:
+        '200':
+          description: Full weather forecast data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullWeather'
+        '204':
+          description: No forecast data available
+        '404':
+          description: Location not found
+
+  /v1/full/{code}:
+    parameters:
+      - in: path
+        name: code
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Return full weather forecast information for a special location by given code
+      tags: [Full Weather Forecast]
+      responses:
+        '200':
+          description: Full weather forecast data for the specified location
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FullWeather'
+        '204':
+          description: No forecast data available
+        '404':
+          description: Location not found
+  
+    put:
+      summary: Update full weather forecast information for a special location by given code
+      tags: [Full Weather Forecast]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FullWeather'
+      responses:
+        '200':
+          description: Full weather forecast data updated successfully
+        '400':
+          description: Bad request, invalid data provided
+        '404':
+          description: Location not found
+
+
+
+components:
+  schemas:
+    Location:
+      type: object
+      properties:
+        code:
+          type: string
+        city_name:
+          type: string
+        region_name:
+          type: string
+        country_code:
+          type: string
+        country_name:
+          type: string
+        enabled:
+          type: boolean
+
+    RealtimeWeather:
+      type: object
+      properties:
+        location_code:
+          type: string
+        temperature:
+          type: number
+        humidity:
+          type: number
+        precipitation:
+          type: number
+        status:
+          type: string
+        wind_speed:
+          type: number
+        last_update:
+          type: string
+          format: date-time
+
+    HourlyWeather:
+      type: object
+      properties:
+        location_code:
+          type: string
+        hourly_forecast:
+          type: array
+          items:
+            type: object
+            properties:
+              hour_of_day:
+                type: integer
+              temperature:
+                type: number
+              precipitation:
+                type: number
+              status:
+                type: string
+
+    DailyWeather:
+      type: object
+      properties:
+        location_code:
+          type: string
+        daily_forecast:
+          type: array
+          items:
+            type: object
+            properties:
+              day_of_month:
+                type: integer
+              month:
+                type: integer
+              min_temp:
+                type: number
+              max_temp:
+                type: number
+              precipitation:
+                type: number
+              status:
+                type: string
+
+    FullWeather:
+      type: object
+      properties:
+        location_code:
+          type: string
+        realtime:
+          $ref: '#/components/schemas/RealtimeWeather'
+        hourly_forecast:
+          $ref: '#/components/schemas/HourlyWeather'
+        daily_forecast:
+          $ref: '#/components/schemas/DailyWeather'

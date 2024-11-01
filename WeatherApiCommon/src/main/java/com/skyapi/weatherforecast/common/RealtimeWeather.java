@@ -12,7 +12,7 @@ public class RealtimeWeather {
 
     @Id
     @Column(name = "location_code")
-    @JsonProperty("location_code") // JSON property annotation
+    @JsonProperty("location_code")
     private String locationCode;
 
     @NotNull
