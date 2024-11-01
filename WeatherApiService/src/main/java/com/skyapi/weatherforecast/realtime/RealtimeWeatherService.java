@@ -22,7 +22,7 @@ public class RealtimeWeatherService {
 
         RealtimeWeather realtimeWeather = realtimeWeatherRepository.findByCountryCodeAndCity(countryCode, city);
         if (realtimeWeather == null) {
-            throw  new LocationNotFoundException("No location found with the given country and city");
+            throw new LocationNotFoundException("No location found with the given country and city");
         }
 
         return realtimeWeather;

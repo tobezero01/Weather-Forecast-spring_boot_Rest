@@ -15,7 +15,7 @@ public class GeolocationService {
     // information content : https://github.com/ip2location/ip2location-java
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GeolocationService.class);
-    private String DBPath = "ip2locdb/IP2LOCATION-LITE-DB3.BIN";
+    private String DBPath = "ip2locdb/IP2LOCATION-LITE-DB11.BIN";
     private IP2Location ipLocator = new IP2Location();
 
     public GeolocationService() {

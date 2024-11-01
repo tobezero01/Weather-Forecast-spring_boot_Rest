@@ -1,5 +1,6 @@
 package com.skyapi.weatherforecast.common;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -38,12 +39,14 @@ public class RealtimeWeather {
     @JsonProperty("last_update")
     private Date lastUpdated;
 
-    @OneToOne(cascade = CascadeType.ALL) // Change as per your use case
+    @OneToOne(cascade = CascadeType.ALL) // Adjust according to your application logic
     @JoinColumn(name = "location_code")
     @MapsId
+    @JsonManagedReference // This prevents infinite recursion during serialization
     private Location location;
 
     public RealtimeWeather() {
+        this.lastUpdated = new Date(); // Initialize lastUpdated with the current date
     }
 
     public String getLocationCode() {

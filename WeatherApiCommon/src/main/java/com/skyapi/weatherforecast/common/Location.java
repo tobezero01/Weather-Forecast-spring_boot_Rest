@@ -1,5 +1,6 @@
 package com.skyapi.weatherforecast.common;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
@@ -47,8 +48,9 @@ public class Location {
     private boolean trashed;
 
     @OneToOne(mappedBy = "location", cascade = CascadeType.ALL)
-    @PrimaryKeyJoinColumn
+    @JsonBackReference // This prevents infinite recursion during serialization
     private RealtimeWeather realtimeWeather;
+
 
     public Location() {
     }

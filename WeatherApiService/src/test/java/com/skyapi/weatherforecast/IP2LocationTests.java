@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.*;
 public class IP2LocationTests {
 
     // information https://github.com/ip2location/ip2location-java
-    private String DBPath = "ip2locdb/IP2LOCATION-LITE-DB3.BIN";
+    private String DBPath = "ip2locdb/IP2LOCATION-LITE-DB11.BIN";
 
     public IP2Location ip2Location;
 
