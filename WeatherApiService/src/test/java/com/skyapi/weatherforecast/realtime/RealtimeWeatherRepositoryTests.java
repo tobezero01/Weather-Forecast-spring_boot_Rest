@@ -34,11 +34,8 @@ public class RealtimeWeatherRepositoryTests {
         realtimeWeather.setLastUpdated(new Date());
 
         RealtimeWeather realtimeWeatherBefore = realtimeWeatherRepository.save(realtimeWeather);
-
         assertThat(realtimeWeatherBefore).isNotNull();
         assertThat(realtimeWeatherBefore.getTemperature()).isEqualTo(30);
         assertThat(realtimeWeatherBefore.getHumidity()).isEqualTo(50);
-
     }
-
 }

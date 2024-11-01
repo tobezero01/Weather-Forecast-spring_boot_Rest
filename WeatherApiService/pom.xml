@@ -115,6 +115,14 @@
 			<version>3.0.0</version>
 		</dependency>
 
+		<!-- IP2Location Java Library for file-based lookup -->
+		<dependency>
+			<groupId>com.ip2location</groupId>
+			<artifactId>ip2location-java</artifactId>
+			<version>8.10.0</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
