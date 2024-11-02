@@ -1,5 +1,7 @@
 package com.skyapi.weatherforecast.location;
 
+import com.skyapi.weatherforecast.common.HourlyWeather;
+import com.skyapi.weatherforecast.common.HourlyWeatherId;
 import com.skyapi.weatherforecast.common.Location;
 import com.skyapi.weatherforecast.common.RealtimeWeather;
 import org.junit.jupiter.api.Test;
@@ -103,6 +105,47 @@ public class LocationRepositoryTests {
         assertThat(updatedLocation.getRealtimeWeather().getTemperature()).isEqualTo(25);
         assertThat(updatedLocation.getRealtimeWeather().getHumidity()).isEqualTo(70);
         assertThat(updatedLocation.getRealtimeWeather().getStatus()).isEqualTo("Clear");
+    }
+
+
+    // test for hourly
+
+    @Test
+    public void testAddHourlyWeatherData() {
+        Location location = locationRepository.findById("LOC004").get();
+        List<HourlyWeather> hourlyWeatherList = location.getListHourlyWeather();
+
+        HourlyWeather forecast1 = new HourlyWeather().id(location, 8)
+                .temperature(20).precipitation(60).status("Sunny");
+        HourlyWeather forecast2 = new HourlyWeather().location(location).hourOfDay(9)
+                .temperature(20).precipitation(60).status("Sunny");
+
+        hourlyWeatherList.add(forecast1);
+        hourlyWeatherList.add(forecast2);
+
+        Location updatedLocation = locationRepository.save(location);
+        assertThat(updatedLocation.getListHourlyWeather()).isNotEmpty();
+    }
+
+    @Test
+    public void testFindByCountryCodeAndCityName_NotFound() {
+        String countryCode = "US";
+        String cityName = "New York City";
+
+        Location location = locationRepository.findByCountryCodeAndCityName(countryCode, cityName);
+
+        assertThat(location).isNull();
+    }
+
+    @Test
+    public void testFindByCountryCodeAndCityName_Found() {
+        String countryCode = "LOC004";
+        String cityName = "Nha Trang";
+
+        Location location = locationRepository.findByCountryCodeAndCityName(countryCode, cityName);
+
+        assertThat(location).isNotNull();
+        assertThat(location.getCountryCode()).isEqualTo("LOC004");
     }
 
 

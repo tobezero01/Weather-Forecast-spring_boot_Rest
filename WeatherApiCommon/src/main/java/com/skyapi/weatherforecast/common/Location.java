@@ -8,6 +8,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.List;
+
 @Entity
 @Table(name = "locations")
 public class Location {
@@ -50,6 +52,9 @@ public class Location {
     @OneToOne(mappedBy = "location", cascade = CascadeType.ALL)
     @JsonBackReference // This prevents infinite recursion during serialization
     private RealtimeWeather realtimeWeather;
+
+    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL)
+    private List<HourlyWeather> listHourlyWeather;
 
 
     public Location() {
@@ -143,6 +148,19 @@ public class Location {
 
     public void setRealtimeWeather(RealtimeWeather realtimeWeather) {
         this.realtimeWeather = realtimeWeather;
+    }
+
+    public List<HourlyWeather> getListHourlyWeather() {
+        return listHourlyWeather;
+    }
+
+    public Location code(String code) {
+        setCode(code);
+        return this;
+    }
+
+    public void setListHourlyWeather(List<HourlyWeather> listHourlyWeather) {
+        this.listHourlyWeather = listHourlyWeather;
     }
 
     @Override
