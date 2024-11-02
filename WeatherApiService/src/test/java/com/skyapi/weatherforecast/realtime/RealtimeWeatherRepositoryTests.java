@@ -54,4 +54,19 @@ public class RealtimeWeatherRepositoryTests {
 
         assertThat(foundWeather).isNull();
     }
+
+    @Test
+    public void testFindByLocationCode_NotFound() {
+        RealtimeWeather realtimeWeather= realtimeWeatherRepository.findByLocationCode("ADV");
+
+        assertThat(realtimeWeather).isNull();
+    }
+
+    @Test
+    public void testFindByLocationCode_Found() {
+        RealtimeWeather realtimeWeather= realtimeWeatherRepository.findByLocationCode("LOC001");
+
+        assertThat(realtimeWeather).isNotNull();
+        assertThat(realtimeWeather.getLocationCode()).isEqualTo("LOC001");
+    }
 }

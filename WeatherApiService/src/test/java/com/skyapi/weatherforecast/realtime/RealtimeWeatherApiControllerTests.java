@@ -110,4 +110,50 @@ public class RealtimeWeatherApiControllerTests {
                 .andDo(print());
     }
 
+
+    @Test
+    void testGetRealtimeWeatherByLocationCode_Success() throws Exception {
+        // Arrange
+        String locationCode = "LOC001";
+        RealtimeWeather mockWeather = new RealtimeWeather();
+        mockWeather.setLocationCode(locationCode);
+        mockWeather.setTemperature(25);
+        mockWeather.setHumidity(70);
+        mockWeather.setWindSpeed(15);
+        mockWeather.setStatus("Clear");
+
+        RealtimeWeatherDTO mockDTO = new RealtimeWeatherDTO();
+        mockDTO.setLocation(locationCode);
+        mockDTO.setTemperature(25);
+        mockDTO.setHumidity(70);
+        mockDTO.setWindSpeed(15);
+        mockDTO.setStatus("Clear");
+
+        when(realtimeWeatherService.getByLocationCode(locationCode)).thenReturn(mockWeather);
+
+        // Act & Assert
+        mockMvc.perform(get(END_POINT_PATH, locationCode)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.temperature").value(25))
+                .andExpect(jsonPath("$.humidity").value(70))
+                .andExpect(jsonPath("$.windSpeed").value(15))
+                .andExpect(jsonPath("$.status").value("Clear"))
+                .andDo(print());
+    }
+
+    @Test
+    void testGetRealtimeWeatherByLocationCode_NotFound() throws Exception {
+        // Arrange
+        String locationCode = "INVALID_CODE";
+
+        when(realtimeWeatherService.getByLocationCode(locationCode)).thenThrow(new LocationNotFoundException("Location not found"));
+
+        // Act & Assert
+        mockMvc.perform(get(END_POINT_PATH, locationCode)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andDo(print());
+    }
+
 }
