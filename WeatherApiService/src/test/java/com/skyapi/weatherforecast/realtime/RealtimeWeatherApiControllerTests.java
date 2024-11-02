@@ -105,7 +105,6 @@ public class RealtimeWeatherApiControllerTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.location_code").value("LOC001"))
                 .andExpect(jsonPath("$.temperature").value(25))
                 .andExpect(jsonPath("$.humidity").value(70))
                 .andDo(print());

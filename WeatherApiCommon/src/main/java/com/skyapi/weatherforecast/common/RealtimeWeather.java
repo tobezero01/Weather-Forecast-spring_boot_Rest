@@ -36,7 +36,7 @@ public class RealtimeWeather {
     @JsonProperty("status")
     private String status;
 
-    @JsonProperty("last_update")
+    @JsonProperty("last_updated")
     private Date lastUpdated;
 
     @OneToOne(cascade = CascadeType.ALL) // Adjust according to your application logic
