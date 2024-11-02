@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -156,4 +157,60 @@ public class RealtimeWeatherApiControllerTests {
                 .andDo(print());
     }
 
+    @Test
+    public void testUpdateRealtimeWeather_Success() throws Exception {
+        // Arrange
+        String locationCode = "LOC001";
+        RealtimeWeather updatedWeather = new RealtimeWeather();
+        updatedWeather.setLocationCode(locationCode);
+        updatedWeather.setTemperature(35);
+        updatedWeather.setHumidity(80);
+        updatedWeather.setPrecipitation(0);
+        updatedWeather.setWindSpeed(35);
+        updatedWeather.setStatus("Cloudy");
+        updatedWeather.setLastUpdated(new Date());
+
+        // Mock the service to return the updated entity
+        Mockito.when(realtimeWeatherService.update(eq(locationCode), any(RealtimeWeather.class)))
+                .thenReturn(updatedWeather);
+
+        // Convert DTO to JSON
+        String jsonRequest = mapper.writeValueAsString(updatedWeather);
+
+        // Act & Assert
+        mockMvc.perform(put("/v1/realtime/" + locationCode)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.temperature").value(35))
+                .andExpect(jsonPath("$.humidity").value(80))
+                .andExpect(jsonPath("$.precipitation").value(0))
+                .andExpect(jsonPath("$.wind_speed").value(35))
+                .andExpect(jsonPath("$.status").value("Cloudy"));
+    }
+
+    @Test
+    public void testUpdateRealtimeWeather_NotFound() throws Exception {
+        // Arrange
+        String locationCode = "LOC001";
+        RealtimeWeather weather = new RealtimeWeather();
+        weather.setTemperature(35);
+        weather.setHumidity(80);
+        weather.setPrecipitation(0);
+        weather.setWindSpeed(35);
+        weather.setStatus("Cloudy");
+
+        // Mock the service to throw LocationNotFoundException
+        Mockito.when(realtimeWeatherService.update(eq(locationCode), any(RealtimeWeather.class)))
+                .thenThrow(new LocationNotFoundException("No location found with the given locationCode : " + locationCode));
+
+        // Convert DTO to JSON
+        String jsonRequest = mapper.writeValueAsString(weather);
+
+        // Act & Assert
+        mockMvc.perform(put("/v1/realtime/" + locationCode)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonRequest))
+                .andExpect(status().isNotFound());
+    }
 }
