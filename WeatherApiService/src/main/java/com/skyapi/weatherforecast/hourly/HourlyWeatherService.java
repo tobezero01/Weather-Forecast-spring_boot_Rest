@@ -31,4 +31,13 @@ public class HourlyWeatherService {
 
         return hourlyWeatherRepository.findByLocationCode(locationInDB.getCode(), currentHour);
     }
+
+    public List<HourlyWeather> getByLocationCode(String locationCode, int currentHour) throws LocationNotFoundException {
+        Location locationInDB = locationRepository.findByCode(locationCode);
+        if (locationInDB == null) {
+            throw new LocationNotFoundException("Location not found with the given code");
+        }
+
+        return hourlyWeatherRepository.findByLocationCode(locationCode, currentHour);
+    }
 }

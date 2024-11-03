@@ -3,6 +3,7 @@ package com.skyapi.weatherforecast.hourly;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skyapi.weatherforecast.GeolocationService;
 import com.skyapi.weatherforecast.common.HourlyWeather;
+import com.skyapi.weatherforecast.common.HourlyWeatherId;
 import com.skyapi.weatherforecast.common.Location;
 import com.skyapi.weatherforecast.exception.GeolocationException;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
@@ -22,6 +23,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -123,6 +125,85 @@ public class HourlyWeatherApiControllerTests {
         mockMvc.perform(get(END_POINT_PATH)
                         .header("X-Current-Hour", String.valueOf(currentHour))
                         .header("X-Forwarded-For", ipAddress)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
+    void listHourlyForecastByLocationCode_200OK() throws Exception {
+        // Arrange
+        String locationCode = "LOC001";
+        int currentHour = 10;
+
+        Location location = new Location();
+        location.setCode(locationCode);
+        location.setCityName("Hanoi");
+        location.setRegionName("Red River Delta");
+        location.setCountryCode("VN");
+        location.setCountryName("Viet nam");
+
+        HourlyWeather hourlyWeather1 = new HourlyWeather()
+                .location(location).hourOfDay(8)
+                .temperature(30).precipitation(50)
+                .status("Cloudy");
+        HourlyWeather hourlyWeather2 = new HourlyWeather()
+                .location(location).hourOfDay(9)
+                .temperature(30).precipitation(50)
+                .status("Sunny");
+
+        List<HourlyWeather> hourlyForecasts = List.of(hourlyWeather1, hourlyWeather2);
+
+        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenReturn(hourlyForecasts);
+
+        // Act & Assert
+        mockMvc.perform(get(END_POINT_PATH + "/" + locationCode)
+                        .header("X-Current-Hour", String.valueOf(currentHour))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.location").value(location.toString()))
+                .andExpect(jsonPath("$.hourlyForecast[0].hour_of_day").value(8))
+                .andDo(print());
+    }
+
+    @Test
+    void listHourlyForecastByLocationCode_shouldReturnNoContent_whenNoForecastFound() throws Exception {
+        // Arrange
+        String locationCode = "VN_HN";
+        int currentHour = 10;
+
+        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenReturn(new ArrayList<>());
+
+        // Act & Assert
+        mockMvc.perform(get(END_POINT_PATH + "/" + locationCode)
+                        .header("X-Current-Hour", String.valueOf(currentHour))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    void listHourlyForecastByLocationCode_shouldReturnNotFound_whenLocationNotFound() throws Exception {
+        // Arrange
+        String locationCode = "VN_UNKNOWN";
+        int currentHour = 10;
+
+        when(hourlyWeatherService.getByLocationCode(locationCode, currentHour)).thenThrow(new LocationNotFoundException("Location not found with the given code"));
+
+        // Act & Assert
+        mockMvc.perform(get(END_POINT_PATH + "/" + locationCode)
+                        .header("X-Current-Hour", String.valueOf(currentHour))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void listHourlyForecastByLocationCode_shouldReturnBadRequest_whenHeaderInvalid() throws Exception {
+        // Arrange
+        String locationCode = "VN_HN";
+
+        // Act & Assert
+        mockMvc.perform(get(END_POINT_PATH + "/" + locationCode)
+                        .header("X-Current-Hour", "invalid_hour")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
