@@ -54,6 +54,7 @@ public class Location {
     private RealtimeWeather realtimeWeather;
 
     @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<HourlyWeather> listHourlyWeather;
 
 

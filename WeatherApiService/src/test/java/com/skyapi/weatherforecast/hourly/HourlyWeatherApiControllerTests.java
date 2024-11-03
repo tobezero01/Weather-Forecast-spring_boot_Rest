@@ -50,7 +50,7 @@ public class HourlyWeatherApiControllerTests {
     @Test
     void listHourlyForecastByIPAddress_shouldReturnHourlyForecast() throws Exception {
         // Arrange
-        String ipAddress = "192.168.1.1";
+        String ipAddress = "203.210.142.42";
         int currentHour = 10;
 
         Location locationFromIP = new Location();
@@ -66,7 +66,7 @@ public class HourlyWeatherApiControllerTests {
         // Act & Assert
         mockMvc.perform(get(END_POINT_PATH)
                         .header("X-Current-Hour", String.valueOf(currentHour))
-                        .header("X-Forwarded-For", ipAddress)
+                        .header("X-Forwarded-For".toUpperCase(), ipAddress)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].temperature").value(25))
@@ -77,8 +77,8 @@ public class HourlyWeatherApiControllerTests {
     @Test
     void listHourlyForecastByIPAddress_shouldReturnNoContent_whenNoForecastFound() throws Exception {
         // Arrange
-        String ipAddress = "192.168.1.1";
-        int currentHour = 10;
+        String ipAddress = "203.210.142.42";
+        int currentHour = 9;
 
         Location locationFromIP = new Location();
         locationFromIP.setCode("LOC001");

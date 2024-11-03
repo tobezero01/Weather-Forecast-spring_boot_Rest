@@ -112,13 +112,13 @@ public class LocationRepositoryTests {
 
     @Test
     public void testAddHourlyWeatherData() {
-        Location location = locationRepository.findById("LOC004").get();
+        Location location = locationRepository.findById("LOC001").get();
         List<HourlyWeather> hourlyWeatherList = location.getListHourlyWeather();
 
         HourlyWeather forecast1 = new HourlyWeather().id(location, 8)
                 .temperature(20).precipitation(60).status("Sunny");
-        HourlyWeather forecast2 = new HourlyWeather().location(location).hourOfDay(9)
-                .temperature(20).precipitation(60).status("Sunny");
+        HourlyWeather forecast2 = new HourlyWeather().location(location).hourOfDay(10)
+                .temperature(25).precipitation(10).status("Rainy");
 
         hourlyWeatherList.add(forecast1);
         hourlyWeatherList.add(forecast2);

@@ -1,5 +1,6 @@
 package com.skyapi.weatherforecast.common;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.Embeddable;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -8,6 +9,7 @@ import java.io.Serializable;
 
 @Embeddable
 public class HourlyWeatherId implements Serializable {
+    @JsonProperty("hour_of_day")
     private int hourOfDay;
     @ManyToOne
     @JoinColumn(name = "location_code")

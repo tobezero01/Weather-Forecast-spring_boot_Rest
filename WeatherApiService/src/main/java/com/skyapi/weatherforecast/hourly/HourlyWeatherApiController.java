@@ -7,6 +7,7 @@ import com.skyapi.weatherforecast.common.Location;
 import com.skyapi.weatherforecast.exception.GeolocationException;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,19 +22,22 @@ public class HourlyWeatherApiController {
     private HourlyWeatherService hourlyWeatherService;
     private GeolocationService geolocationService;
 
+    private ModelMapper modelMapper;
+
     public HourlyWeatherApiController(HourlyWeatherService hourlyWeatherService,
-                                      GeolocationService geolocationService) {
+                                      GeolocationService geolocationService,
+                                      ModelMapper modelMapper) {
         this.hourlyWeatherService = hourlyWeatherService;
         this.geolocationService = geolocationService;
+        this.modelMapper = modelMapper;
     }
 
     @GetMapping
     public ResponseEntity<?> listHourlyForecastByIPAddress(HttpServletRequest request) {
         String ipAddress = CommonUtility.getIPAddress(request);
 
-        int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));
-
         try {
+            int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));
             Location locationFromIP = geolocationService.getLocation(ipAddress);
 
             List<HourlyWeather> hourlyForecast = hourlyWeatherService.getByLocation(locationFromIP, currentHour);
@@ -41,11 +45,26 @@ public class HourlyWeatherApiController {
             if (hourlyForecast.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }
-            return ResponseEntity.ok(hourlyForecast);
+            return ResponseEntity.ok(listEntity2DTO(hourlyForecast));
         } catch (GeolocationException e) {
             return ResponseEntity.badRequest().build();
         } catch (LocationNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
     }
+
+    public HourlyWeatherListDTO listEntity2DTO(List<HourlyWeather> hourlyWeathers) {
+        Location location = hourlyWeathers.get(0).getId().getLocation();
+
+        HourlyWeatherListDTO listDTO = new HourlyWeatherListDTO();
+        listDTO.setLocation(location.toString());
+        hourlyWeathers.forEach(hourlyWeather -> {
+            HourlyWeatherDTO dto = modelMapper.map(hourlyWeather, HourlyWeatherDTO.class);
+            listDTO.addHourlyWeatherDTO(dto);
+        });
+
+        return listDTO;
+    }
+
+
 }
