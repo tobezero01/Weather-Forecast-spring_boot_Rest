@@ -1,5 +1,6 @@
 package com.skyapi.weatherforecast.hourly;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skyapi.weatherforecast.GeolocationService;
 import com.skyapi.weatherforecast.common.HourlyWeather;
@@ -18,11 +19,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -207,4 +209,44 @@ public class HourlyWeatherApiControllerTests {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
     }
+
+
+    @Test
+    void testUpdate_ShouldReturn404NotFound_NoData() throws Exception {
+        List<HourlyWeatherDTO> listDTO = Collections.emptyList();
+
+        String requestBody = mapper.writeValueAsString(listDTO);
+
+        mockMvc.perform(put(END_POINT_PATH + "/LOC001" ).contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]").value("Hourly forecast data cannot be empty"))
+                .andDo(print());
+
+    }
+
+    @Test
+    void testUpdate_ShouldReturn400BadRequest_InvalidData() throws Exception {
+        HourlyWeatherDTO dto1 = new HourlyWeatherDTO()
+                .hourOfDay(10)
+                .precipitation(10)
+                .temperature(340)  // Invalid temperature, out of range
+                .status("Cloudy");
+        HourlyWeatherDTO dto2 = new HourlyWeatherDTO()
+                .hourOfDay(9)
+                .precipitation(20)
+                .temperature(410)  // Invalid temperature, out of range
+                .status("Sunny");
+
+        List<HourlyWeatherDTO> listDTO = List.of(dto1, dto2);
+        String requestBody = mapper.writeValueAsString(listDTO);
+
+        mockMvc.perform(put(END_POINT_PATH + "/LOC001")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest())  // Expect 400 error
+                .andExpect(jsonPath("$.errors").isNotEmpty())  // Verify error messages
+                .andDo(print());
+    }
+
 }

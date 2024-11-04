@@ -2,6 +2,8 @@ package com.skyapi.weatherforecast.realtime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.skyapi.weatherforecast.common.HourlyWeather;
+import com.skyapi.weatherforecast.hourly.HourlyWeatherDTO;
 
 
 import java.util.Date;

@@ -7,6 +7,8 @@ import com.skyapi.weatherforecast.location.LocationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -39,5 +41,9 @@ public class HourlyWeatherService {
         }
 
         return hourlyWeatherRepository.findByLocationCode(locationCode, currentHour);
+    }
+
+    public List<HourlyWeather> updateByLocationCode(String locationCode, List<HourlyWeather> hourlyWeathersRequest) {
+        return Collections.emptyList();
     }
 }

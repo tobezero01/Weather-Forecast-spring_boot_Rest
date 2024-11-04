@@ -1,5 +1,6 @@
 package com.skyapi.weatherforecast.exception.custom;
 
+import com.skyapi.weatherforecast.exception.BadRequestException;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,7 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.util.Date;
 import java.util.List;
 
@@ -57,6 +59,46 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return error;
     }
+
+    @ExceptionHandler(BadRequestException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDTO handleBadRequestException(HttpServletRequest request, BadRequestException ex) {
+        ErrorDTO error = new ErrorDTO();
+
+        error.setTimestamp(new Date());
+        error.addError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setPath(request.getServletPath());
+
+        LOGGER.error(ex.getMessage(), ex);
+
+        return error;
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDTO handleConstraintViolationException(HttpServletRequest request,
+                                                       ConstraintViolationException ex) {
+        ErrorDTO error = new ErrorDTO();
+        ConstraintViolationException violationException = ex;
+
+        error.setTimestamp(new Date());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
+        error.setPath(request.getServletPath());
+
+        var constraintViolations = violationException.getConstraintViolations();
+
+        constraintViolations.forEach(constraintViolation -> {
+            error.addError(constraintViolation.getPropertyPath() + " : " + constraintViolation.getMessage());
+        });
+
+        LOGGER.error("ConstraintViolationException: {}", ex.getMessage(), ex);
+
+        return error;
+    }
+
 
     /**
      * Customize the handling of {@link MethodArgumentNotValidException}.
