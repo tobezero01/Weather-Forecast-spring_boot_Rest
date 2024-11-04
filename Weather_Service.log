@@ -1,8 +1,10 @@
-2024-11-01T22:40:42.902+07:00  WARN 24744 --- [WeatherApiService] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2024-11-01T22:40:42.909+07:00  WARN 24744 --- [WeatherApiService] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
-2024-11-01T22:40:44.406+07:00 ERROR 24744 --- [WeatherApiService] [restartedMain] c.s.weatherforecast.GeolocationService   : ip2locdb\IP2LOCATION-LITE-DB3.BIN (The system cannot find the path specified)
+2024-11-04T18:37:58.667+07:00  WARN 22520 --- [WeatherApiService] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQL8Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-11-04T18:37:58.687+07:00  WARN 22520 --- [WeatherApiService] [restartedMain] org.hibernate.orm.deprecation            : HHH90000026: MySQL8Dialect has been deprecated; use org.hibernate.dialect.MySQLDialect instead
+2024-11-04T18:37:59.251+07:00  WARN 22520 --- [WeatherApiService] [restartedMain] org.hibernate.mapping.RootClass          : HHH000038: Composite-id class does not override equals(): com.skyapi.weatherforecast.common.HourlyWeatherId
+2024-11-04T18:37:59.252+07:00  WARN 22520 --- [WeatherApiService] [restartedMain] org.hibernate.mapping.RootClass          : HHH000039: Composite-id class does not override hashCode(): com.skyapi.weatherforecast.common.HourlyWeatherId
+2024-11-04T18:38:00.228+07:00 ERROR 22520 --- [WeatherApiService] [restartedMain] c.s.weatherforecast.GeolocationService   : ip2locdb\IP2LOCATION-LITE-DB11.BIN (The system cannot find the path specified)
 
-java.io.FileNotFoundException: ip2locdb\IP2LOCATION-LITE-DB3.BIN (The system cannot find the path specified)
+java.io.FileNotFoundException: ip2locdb\IP2LOCATION-LITE-DB11.BIN (The system cannot find the path specified)
 	at java.base/java.io.RandomAccessFile.open0(Native Method) ~[na:na]
 	at java.base/java.io.RandomAccessFile.open(RandomAccessFile.java:354) ~[na:na]
 	at java.base/java.io.RandomAccessFile.<init>(RandomAccessFile.java:271) ~[na:na]
@@ -35,9 +37,9 @@ java.io.FileNotFoundException: ip2locdb\IP2LOCATION-LITE-DB3.BIN (The system can
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:335) ~[spring-boot-3.3.5.jar:3.3.5]
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1363) ~[spring-boot-3.3.5.jar:3.3.5]
 	at org.springframework.boot.SpringApplication.run(SpringApplication.java:1352) ~[spring-boot-3.3.5.jar:3.3.5]
-	at com.skyapi.weatherforecast.WeatherApiServiceApplication.main(WeatherApiServiceApplication.java:12) ~[classes/:na]
+	at com.skyapi.weatherforecast.WeatherApiServiceApplication.main(WeatherApiServiceApplication.java:17) ~[classes/:na]
 	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103) ~[na:na]
 	at java.base/java.lang.reflect.Method.invoke(Method.java:580) ~[na:na]
 	at org.springframework.boot.devtools.restart.RestartLauncher.run(RestartLauncher.java:50) ~[spring-boot-devtools-3.3.5.jar:3.3.5]
 
-2024-11-01T22:40:46.156+07:00  WARN 24744 --- [WeatherApiService] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-11-04T18:38:02.430+07:00  WARN 22520 --- [WeatherApiService] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning

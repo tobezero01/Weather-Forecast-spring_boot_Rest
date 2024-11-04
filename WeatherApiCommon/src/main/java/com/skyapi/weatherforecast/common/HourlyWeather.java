@@ -94,4 +94,23 @@ public class HourlyWeather {
                 ", status='" + status + '\'' +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HourlyWeather that)) return false;
+
+        return getId().equals(that.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return getId().hashCode();
+    }
+
+    public HourlyWeather getShallowCopy() {
+        HourlyWeather copy = new HourlyWeather();
+        copy.setId(this.getId());
+        return copy;
+    }
 }

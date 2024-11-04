@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -246,6 +246,54 @@ public class HourlyWeatherApiControllerTests {
                         .content(requestBody))
                 .andExpect(status().isBadRequest())  // Expect 400 error
                 .andExpect(jsonPath("$.errors").isNotEmpty())  // Verify error messages
+                .andDo(print());
+    }
+
+
+    @Test
+    void updateHourlyForecastByLocationCode_200OK() throws Exception {
+        // Arrange
+        String locationCode = "LOC001";
+
+        HourlyWeatherDTO dto1 = new HourlyWeatherDTO().hourOfDay(10)
+                .temperature(25).status("Sunny").precipitation(20);
+        HourlyWeatherDTO dto2 = new HourlyWeatherDTO().hourOfDay(11)
+                .temperature(30).status("Cloudy").precipitation(15);
+
+        Location location = new Location();
+        location.setCode(locationCode);
+        location.setCityName("Hanoi");
+        location.setRegionName("Red River Delta");
+        location.setCountryCode("VN");
+        location.setCountryName("Viet nam");
+
+        HourlyWeather hourlyWeather1 = new HourlyWeather()
+                .location(location).hourOfDay(10)
+                .temperature(25).precipitation(20)
+                .status("Sunny");
+        HourlyWeather hourlyWeather2 = new HourlyWeather()
+                .location(location).hourOfDay(11)
+                .temperature(30).precipitation(15)
+                .status("Cloudy");
+
+        List<HourlyWeatherDTO> listDTO = List.of(dto1, dto2);
+        List<HourlyWeather> updatedHourlyWeather = List.of(hourlyWeather1, hourlyWeather2);
+
+        when(hourlyWeatherService.updateByLocationCode(eq(locationCode), anyList())).thenReturn(updatedHourlyWeather);
+
+        // Act & Assert
+        mockMvc.perform(put(END_POINT_PATH + "/" + locationCode)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(mapper.writeValueAsString(listDTO)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.hourlyWeather[0].hour_of_day").value(10))
+                .andExpect(jsonPath("$.hourlyWeather[0].temperature").value(25))
+                .andExpect(jsonPath("$.hourlyWeather[0].status").value("Sunny"))
+                .andExpect(jsonPath("$.hourlyWeather[0].precipitation").value(20))
+                .andExpect(jsonPath("$.hourlyWeather[1].hour_of_day").value(11))
+                .andExpect(jsonPath("$.hourlyWeather[1].temperature").value(30))
+                .andExpect(jsonPath("$.hourlyWeather[1].status").value("Cloudy"))
+                .andExpect(jsonPath("$.hourlyWeather[1].precipitation").value(15))
                 .andDo(print());
     }
 

@@ -85,8 +85,13 @@ public class HourlyWeatherApiController {
         // Converting DTO list to entity list
         List<HourlyWeather> hourlyWeatherList = listDTO2ListEntity(listDTO);
 
-        // Returning accepted response for valid data
-        return ResponseEntity.accepted().build();
+        try {
+            List<HourlyWeather> updatedHourlyWeather = hourlyWeatherService.updateByLocationCode(locationCode, hourlyWeatherList);
+            return ResponseEntity.ok(listEntity2DTO(updatedHourlyWeather));
+        } catch (LocationNotFoundException exception) {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
 

@@ -1,5 +1,6 @@
 package com.skyapi.weatherforecast.hourly;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.skyapi.weatherforecast.common.Location;
 
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 public class HourlyWeatherListDTO {
     private String location;
 
+    @JsonProperty("hourlyWeather") // Ensure JSON output matches expected path
     private List<HourlyWeatherDTO> hourlyForecast = new ArrayList<>();
 
     public String getLocation() {
