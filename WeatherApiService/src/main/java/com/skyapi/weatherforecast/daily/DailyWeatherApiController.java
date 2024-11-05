@@ -51,15 +51,16 @@ public class DailyWeatherApiController {
         return ResponseEntity.ok(listEntity2DTO(dailyWeathers));
      }
 
+     @GetMapping("/{locationCode}")
+     public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode) {
+        List<DailyWeather> dailyWeathers = dailyWeatherService.getByLocationCode(locationCode);
 
-    private List<HourlyWeather> listDTO2ListEntity(List<HourlyWeatherDTO> listDTO) {
-        List<HourlyWeather> list = new ArrayList<>();
+        if (dailyWeathers.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
 
-        listDTO.forEach(dto -> {
-            list.add(modelMapper.map(dto, HourlyWeather.class));
-        });
-        return list;
-    }
+        return ResponseEntity.ok(listEntity2DTO(dailyWeathers));
+     }
 
     private DailyWeatherListDTO listEntity2DTO(List<DailyWeather> dailyForecast) {
         Location location = dailyForecast.get(0).getId().getLocation();
@@ -73,6 +74,8 @@ public class DailyWeatherApiController {
 
         return listDTO;
     }
+
+
 
 
 }
