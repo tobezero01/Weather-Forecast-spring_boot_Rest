@@ -71,4 +71,38 @@ public class DailyWeather {
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public DailyWeather location(Location location) {
+        this.id.setLocation(location);
+        return this;
+    }
+
+    public DailyWeather status(String status) {
+        setStatus(status);
+        return this;
+    }
+
+    public DailyWeather precipitation(int precipitation) {
+        setPrecipitation(precipitation);
+        return this;
+    }
+
+    public DailyWeather maxTemp(int maxTemp) {
+        setMaxTemp(maxTemp);
+        return this;
+    }
+
+    public DailyWeather minTemp(int minTemp) {
+        setMinTemp(minTemp);
+        return this;
+    }
+
+    public DailyWeather dayOfMonth(int day) {
+        this.id.setDayOfMonth(day);
+        return this;
+    }
+    public DailyWeather month(int month) {
+        this.id.setMonth(month);
+        return this;
+    }
 }

@@ -1,15 +1,13 @@
 package com.skyapi.weatherforecast.location;
 
-import com.skyapi.weatherforecast.common.HourlyWeather;
-import com.skyapi.weatherforecast.common.HourlyWeatherId;
-import com.skyapi.weatherforecast.common.Location;
-import com.skyapi.weatherforecast.common.RealtimeWeather;
+import com.skyapi.weatherforecast.common.*;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.test.annotation.Rollback;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -148,5 +146,23 @@ public class LocationRepositoryTests {
         assertThat(location.getCountryCode()).isEqualTo("LOC004");
     }
 
+
+    // test for
+    @Test
+    public void testAddDailyWeather() {
+        Location location = locationRepository.findById("LOC001").get();
+        List<DailyWeather> list = location.getListDailyWeather();
+
+        DailyWeather dailyWeather1 = new DailyWeather().location(location)
+                .dayOfMonth(17).month(7).minTemp(20).maxTemp(30)
+                .precipitation(30).status("Sunny");
+        DailyWeather dailyWeather2 = new DailyWeather().location(location)
+                .dayOfMonth(18).month(7).minTemp(20).maxTemp(30)
+                .precipitation(20).status("Cloudy");
+
+        list.add(dailyWeather1);list.add(dailyWeather2);
+        Location updatedLocation = locationRepository.save(location);
+        assertThat(updatedLocation.getListDailyWeather()).isNotEmpty();
+    }
 
 }
