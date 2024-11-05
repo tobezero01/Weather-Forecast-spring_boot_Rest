@@ -45,17 +45,14 @@ public class RealtimeWeatherService {
     }
 
     public RealtimeWeather update(String locationCode, RealtimeWeather updatedRealtimeWeather) throws LocationNotFoundException {
-        // Lấy đối tượng Location để kiểm tra xem nó có tồn tại không
         Location location = locationRepository.findByCode(locationCode);
 
         if (location == null) {
             throw new LocationNotFoundException("Không tìm thấy vị trí với mã locationCode: " + locationCode);
         }
 
-        // Kiểm tra xem đã có RealtimeWeather nào liên kết với Location này chưa
         RealtimeWeather existingWeather = location.getRealtimeWeather();
         if (existingWeather != null) {
-            // Cập nhật các trường của đối tượng đang được quản lý (managed entity)
             existingWeather.setTemperature(updatedRealtimeWeather.getTemperature());
             existingWeather.setHumidity(updatedRealtimeWeather.getHumidity());
             existingWeather.setPrecipitation(updatedRealtimeWeather.getPrecipitation());
@@ -65,7 +62,6 @@ public class RealtimeWeatherService {
 
             return realtimeWeatherRepository.save(existingWeather);
         } else {
-            // Nếu chưa có RealtimeWeather nào, thiết lập đối tượng mới và lưu
             updatedRealtimeWeather.setLocation(location);
             updatedRealtimeWeather.setLastUpdated(new Date());
             location.setRealtimeWeather(updatedRealtimeWeather);

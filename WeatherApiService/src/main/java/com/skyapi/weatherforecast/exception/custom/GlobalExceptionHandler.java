@@ -29,20 +29,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(LocationNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ResponseBody
-    public ErrorDTO handleLocationNotFoundException(HttpServletRequest request, LocationNotFoundException ex) {
-        ErrorDTO error = new ErrorDTO();
-
-        error.setTimestamp(new Date());
-        error.addError(HttpStatus.NOT_FOUND.getReasonPhrase());
-        error.setStatus(HttpStatus.NOT_FOUND.value());
-        error.setPath(request.getServletPath());
-
-        LOGGER.error(ex.getMessage(), ex);
-        return error;
-    }
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -75,6 +61,23 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
         return error;
     }
+
+    @ExceptionHandler(LocationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ErrorDTO handleLocationNotFoundException(HttpServletRequest request, LocationNotFoundException ex) {
+        ErrorDTO error = new ErrorDTO();
+
+        error.setTimestamp(new Date());
+        error.addError(ex.getMessage());
+        error.setStatus(HttpStatus.NOT_FOUND.value());
+        error.setPath(request.getServletPath());
+
+        LOGGER.error(ex.getMessage(), ex);
+
+        return error;
+    }
+
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

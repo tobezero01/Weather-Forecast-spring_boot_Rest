@@ -1,6 +1,6 @@
 package com.skyapi.weatherforecast.exception;
 
-public class LocationNotFoundException extends Exception {
+public class LocationNotFoundException extends RuntimeException {
 
     /**
      * Constructs a new exception with the specified detail message.  The

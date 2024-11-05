@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -53,10 +54,13 @@ public class Location {
     @JsonBackReference // This prevents infinite recursion during serialization
     private RealtimeWeather realtimeWeather;
 
-    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonBackReference
-    private List<HourlyWeather> listHourlyWeather;
+    private List<HourlyWeather> listHourlyWeather = new ArrayList<>();
 
+    @OneToMany(mappedBy = "id.location", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonBackReference
+    private List<DailyWeather> listDailyWeather = new ArrayList<>();
 
     public Location() {
     }
@@ -81,6 +85,14 @@ public class Location {
         this.countryCode = countryCode;
         this.enabled = enabled;
         this.trashed = trashed;
+    }
+
+    public List<DailyWeather> getListDailyWeather() {
+        return listDailyWeather;
+    }
+
+    public void setListDailyWeather(List<DailyWeather> listDailyWeather) {
+        this.listDailyWeather = listDailyWeather;
     }
 
     public Location(String code) {
