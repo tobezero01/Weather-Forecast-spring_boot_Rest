@@ -49,10 +49,10 @@ public class DailyWeatherApiController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.ok(listEntity2DTO(dailyWeathers));
-     }
+    }
 
-     @GetMapping("/{locationCode}")
-     public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode) {
+    @GetMapping("/{locationCode}")
+    public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode) {
         List<DailyWeather> dailyWeathers = dailyWeatherService.getByLocationCode(locationCode);
 
         if (dailyWeathers.isEmpty()) {
@@ -60,7 +60,22 @@ public class DailyWeatherApiController {
         }
 
         return ResponseEntity.ok(listEntity2DTO(dailyWeathers));
-     }
+    }
+
+    @PutMapping("/{locationCode}")
+    public ResponseEntity<?> updateDailyForecast(@PathVariable("locationCode") String locationCode,
+                                                 @RequestBody @Valid List<DailyWeatherDTO> listDTO) throws BadRequestException {
+        if (listDTO.isEmpty()) {
+            throw new BadRequestException("Daily forecast data cannot be empty");
+        }
+
+        // Converting DTO list to entity list
+        List<DailyWeather> dailyWeatherList = listDTO2ListEntity(listDTO);
+
+        List<DailyWeather> updatedForecast = dailyWeatherService.updateByLocationCode(locationCode, dailyWeatherList);
+
+        return ResponseEntity.ok(listEntity2DTO(updatedForecast));
+    }
 
     private DailyWeatherListDTO listEntity2DTO(List<DailyWeather> dailyForecast) {
         Location location = dailyForecast.get(0).getId().getLocation();
@@ -75,7 +90,14 @@ public class DailyWeatherApiController {
         return listDTO;
     }
 
+    private List<DailyWeather> listDTO2ListEntity(List<DailyWeatherDTO> listDTO) {
+        List<DailyWeather> list = new ArrayList<>();
 
+        listDTO.forEach(dto -> {
+            list.add(modelMapper.map(dto, DailyWeather.class));
+        });
+        return list;
+    }
 
 
 }

@@ -38,4 +38,20 @@ public class HourlyWeatherId implements Serializable {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof HourlyWeatherId that)) return false;
+
+        if (getHourOfDay() != that.getHourOfDay()) return false;
+        return getLocation() != null ? getLocation().equals(that.getLocation()) : that.getLocation() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getHourOfDay();
+        result = 31 * result + (getLocation() != null ? getLocation().hashCode() : 0);
+        return result;
+    }
 }

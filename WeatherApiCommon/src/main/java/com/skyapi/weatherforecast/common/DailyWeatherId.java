@@ -51,4 +51,22 @@ public class DailyWeatherId implements Serializable {
     public void setLocation(Location location) {
         this.location = location;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof DailyWeatherId that)) return false;
+
+        if (getDayOfMonth() != that.getDayOfMonth()) return false;
+        if (getMonth() != that.getMonth()) return false;
+        return getLocation().equals(that.getLocation());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getDayOfMonth();
+        result = 31 * result + getMonth();
+        result = 31 * result + getLocation().hashCode();
+        return result;
+    }
 }

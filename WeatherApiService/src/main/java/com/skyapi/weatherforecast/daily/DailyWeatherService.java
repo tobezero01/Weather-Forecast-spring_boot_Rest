@@ -7,6 +7,7 @@ import com.skyapi.weatherforecast.location.LocationRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -43,5 +44,32 @@ public class DailyWeatherService {
         }
 
         return dailyWeatherRepository.findByLocationCode(locationCode);
+    }
+
+    public List<DailyWeather> updateByLocationCode(String code, List<DailyWeather> dailyWeatherInRequest) {
+        Location location = locationRepository.findByCode(code);
+
+        if (location == null) {
+            throw new LocationNotFoundException("Location not found with the given country code and city name");
+        }
+
+        for (DailyWeather data : dailyWeatherInRequest) {
+            data.getId().setLocation(location);
+        }
+
+        List<DailyWeather> dailyWeatherInDB = location.getListDailyWeather();
+        List<DailyWeather> dailyWeatherToBeRemoved = new ArrayList<>();
+
+        for (DailyWeather forecast : dailyWeatherInDB) {
+            if (!dailyWeatherInRequest.contains(forecast) ) {
+                dailyWeatherToBeRemoved.add(forecast.getShallowCopy());
+            }
+        }
+
+        for (DailyWeather forecastToBeRemoved : dailyWeatherToBeRemoved) {
+            dailyWeatherInDB.remove(forecastToBeRemoved);
+        }
+
+        return dailyWeatherRepository.saveAll(dailyWeatherInRequest);
     }
 }

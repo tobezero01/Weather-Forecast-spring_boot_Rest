@@ -34,6 +34,10 @@ public class WeatherApiServiceApplication {
 		typeMap3.addMapping(src -> src.getId().getDayOfMonth(), DailyWeatherDTO :: setDayOfMonth);
 		typeMap3.addMapping(src -> src.getId().getMonth(), DailyWeatherDTO :: setDayOfMonth);
 
+		var typeMap4 = mapper.typeMap(DailyWeatherDTO.class, DailyWeather.class);
+		typeMap4.addMapping(src -> src.getDayOfMonth(), (dest, value) -> dest.getId().setDayOfMonth(value != null ? (int) value : 0 ));
+		typeMap4.addMapping(src -> src.getMonth(), (dest, value) -> dest.getId().setMonth(value != null ? (int) value : 0 ));
+
 		return mapper;
 	}
 	@Bean
