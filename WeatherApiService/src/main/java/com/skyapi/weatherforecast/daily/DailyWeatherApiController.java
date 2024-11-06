@@ -23,6 +23,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/v1/daily")
+@Validated
 public class DailyWeatherApiController {
     private DailyWeatherService dailyWeatherService;
     private GeolocationService geolocationService;

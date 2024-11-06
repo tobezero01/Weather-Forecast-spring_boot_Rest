@@ -1,6 +1,7 @@
 package com.skyapi.weatherforecast.exception.custom;
 
 import com.skyapi.weatherforecast.exception.BadRequestException;
+import com.skyapi.weatherforecast.exception.GeolocationException;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.LoggerFactory;
@@ -71,6 +72,22 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         error.setTimestamp(new Date());
         error.addError(ex.getMessage());
         error.setStatus(HttpStatus.NOT_FOUND.value());
+        error.setPath(request.getServletPath());
+
+        LOGGER.error(ex.getMessage(), ex);
+
+        return error;
+    }
+
+    @ExceptionHandler(GeolocationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ErrorDTO handleGeolocationException(HttpServletRequest request, GeolocationException ex) {
+        ErrorDTO error = new ErrorDTO();
+
+        error.setTimestamp(new Date());
+        error.addError(ex.getMessage());
+        error.setStatus(HttpStatus.BAD_REQUEST.value());
         error.setPath(request.getServletPath());
 
         LOGGER.error(ex.getMessage(), ex);

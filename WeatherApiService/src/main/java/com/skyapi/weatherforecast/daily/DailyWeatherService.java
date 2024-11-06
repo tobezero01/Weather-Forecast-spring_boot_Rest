@@ -50,7 +50,7 @@ public class DailyWeatherService {
         Location location = locationRepository.findByCode(code);
 
         if (location == null) {
-            throw new LocationNotFoundException("Location not found with the given country code and city name");
+            throw new LocationNotFoundException("Location not found with the given code");
         }
 
         for (DailyWeather data : dailyWeatherInRequest) {
