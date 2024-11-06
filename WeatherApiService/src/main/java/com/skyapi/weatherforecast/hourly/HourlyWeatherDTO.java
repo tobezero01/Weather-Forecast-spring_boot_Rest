@@ -1,13 +1,16 @@
 package com.skyapi.weatherforecast.hourly;
 
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.skyapi.weatherforecast.common.HourlyWeather;
+import com.skyapi.weatherforecast.customFieldFilter.HourlyWeatherFieldFilter;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
 @JsonPropertyOrder({"hour_of_day", "temperature", "precipitation", "status"})
+@JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = HourlyWeatherFieldFilter.class)
 public class HourlyWeatherDTO {
     @JsonProperty("hour_of_day")
     private int hourOfDay;

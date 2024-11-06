@@ -1,10 +1,13 @@
 package com.skyapi.weatherforecast.daily;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.skyapi.weatherforecast.common.DailyWeather;
+import com.skyapi.weatherforecast.customFieldFilter.DailyWeatherFieldFilter;
 
 @JsonPropertyOrder({"day_of_month","month","min_temperature","max_temperature","precipitation","status"})
+@JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = DailyWeatherFieldFilter.class)
 public class DailyWeatherDTO {
 
     @JsonProperty("day_of_month")
