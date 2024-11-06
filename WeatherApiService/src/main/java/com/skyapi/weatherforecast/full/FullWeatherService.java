@@ -20,9 +20,18 @@ public class FullWeatherService {
         Location locationInDB = locationRepository.findByCountryCodeAndCityName(locationCode,cityName);
 
         if (locationInDB == null) {
-            throw new LocationNotFoundException("No location found with the given country and city");
+            throw new LocationNotFoundException("No location found with the given countryCode and city name");
         }
 
         return locationInDB;
+    }
+
+    public Location get(String locationCode) {
+        Location location =  locationRepository.findByCode(locationCode);
+        if (location == null) {
+            throw new LocationNotFoundException("No location found with the given code");
+        }
+
+        return location;
     }
 }

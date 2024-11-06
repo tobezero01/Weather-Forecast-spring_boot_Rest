@@ -123,4 +123,72 @@ public class FullWeatherApiControllerTests {
                 .andExpect(jsonPath("$.location").value(locationToString))
                 .andDo(print());
     }
+
+    @Test
+    public void testGetByLocationCode_Return404NotFound() throws Exception {
+        String locationCode = "ADC";
+
+        LocationNotFoundException ex = new LocationNotFoundException("Location not found");
+        when(fullWeatherService.get(locationCode)).thenThrow(ex);
+
+        mockMvc.perform(get(END_POINT_PATH + "/" + locationCode))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errors[0]").value("Location not found"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testGetByLocationCode_return200OK() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC001");
+        location.setCityName("Hanoi");
+        location.setRegionName("Red River Delta");
+        location.setCountryCode("VN");
+        location.setCountryName("Viet nam");
+
+        RealtimeWeather mockWeather = new RealtimeWeather();
+        mockWeather.setLocation(location);
+        mockWeather.setLocationCode(location.getCode());
+        mockWeather.setTemperature(25);
+        mockWeather.setHumidity(70);
+        mockWeather.setPrecipitation(0);
+        mockWeather.setWindSpeed(15);
+        mockWeather.setStatus("Clear");
+        location.setRealtimeWeather(mockWeather);
+
+        DailyWeather dailyWeather1 = new DailyWeather().minTemp(10)
+                .maxTemp(20).location(location).precipitation(30)
+                .status("Sunny").dayOfMonth(22).month(12);
+        DailyWeather dailyWeather2 = new DailyWeather();
+        dailyWeather2.setMinTemp(10);
+        dailyWeather2.setMaxTemp(30);
+        dailyWeather2.setPrecipitation(40);
+        dailyWeather2.setStatus("Cloudy");
+        dailyWeather2.location(location);
+        dailyWeather2.dayOfMonth(23);
+        dailyWeather2.month(12);
+        location.setListDailyWeather(List.of(dailyWeather1, dailyWeather2));
+
+        HourlyWeather hourlyWeather1 = new HourlyWeather()
+                .location(location).hourOfDay(8)
+                .temperature(30).precipitation(50)
+                .status("Cloudy");
+        HourlyWeather hourlyWeather2 = new HourlyWeather()
+                .location(location).hourOfDay(9)
+                .temperature(30).precipitation(50)
+                .status("Sunny");
+        List<HourlyWeather> hourlyForecasts = List.of(hourlyWeather1, hourlyWeather2);
+
+        location.setListHourlyWeather(hourlyForecasts);
+
+        when(fullWeatherService.get(location.getCode())).thenReturn(location);
+
+        String locationToString = location.toString();
+
+        mockMvc.perform(get(END_POINT_PATH))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.location").value(locationToString))
+                .andDo(print());
+    }
 }
