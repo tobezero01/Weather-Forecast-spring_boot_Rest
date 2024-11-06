@@ -7,10 +7,14 @@ import com.skyapi.weatherforecast.common.DailyWeather;
 import com.skyapi.weatherforecast.common.HourlyWeather;
 import com.skyapi.weatherforecast.common.Location;
 import com.skyapi.weatherforecast.common.RealtimeWeather;
+import com.skyapi.weatherforecast.daily.DailyWeatherDTO;
 import com.skyapi.weatherforecast.exception.GeolocationException;
 
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
+import com.skyapi.weatherforecast.hourly.HourlyWeatherDTO;
+import com.skyapi.weatherforecast.realtime.RealtimeWeatherDTO;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,6 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -185,10 +190,115 @@ public class FullWeatherApiControllerTests {
 
         String locationToString = location.toString();
 
-        mockMvc.perform(get(END_POINT_PATH))
+        mockMvc.perform(get(END_POINT_PATH + "/" + location.getCode()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.location").value(locationToString))
+                .andDo(print());
+    }
+
+
+    @Test
+    public void testUpdateByLocationCode_Return400BadRequest_NoDataHourlyWeather() throws Exception {
+        String locationCode = "LOC004";
+        FullWeatherDTO fullWeatherDTO = new FullWeatherDTO();
+
+        String requestBody = objectMapper.writeValueAsString(fullWeatherDTO);
+
+        mockMvc.perform(get(END_POINT_PATH + "/" + locationCode)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]").value("Hourly weather data can not be empty"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testUpdateByLocationCode_Return400BadRequest_NoDataDailyWeather() throws Exception {
+        String locationCode = "LOC004";
+        FullWeatherDTO fullWeatherDTO = new FullWeatherDTO();
+        HourlyWeatherDTO hourlyWeather1 = new HourlyWeatherDTO()
+                .hourOfDay(8)
+                .temperature(30).precipitation(50)
+                .status("Cloudy");
+
+        fullWeatherDTO.getListHourlyWeather().add(hourlyWeather1);
+        String requestBody = objectMapper.writeValueAsString(fullWeatherDTO);
+
+        mockMvc.perform(get(END_POINT_PATH + "/" + locationCode)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errors[0]").value("Daily weather data can not be empty"))
+                .andDo(print());
+    }
+
+    @Test
+    public void testUpdateByLocationCode_Return400BadRequest_InvalidRealtimeWeather() throws Exception {
+        String locationCode = "LOC004";
+        FullWeatherDTO fullWeatherDTO = new FullWeatherDTO();
+        HourlyWeatherDTO hourlyWeather1 = new HourlyWeatherDTO()
+                .hourOfDay(8)
+                .temperature(30).precipitation(50)
+                .status("Cloudy");
+        DailyWeatherDTO dailyWeather1 = new DailyWeatherDTO().minTemp(10)
+                .maxTemp(20).precipitation(30)
+                .status("Sunny").dayOfMonth(22).month(12);
+
+        RealtimeWeatherDTO realtimeDTO = new RealtimeWeatherDTO();
+        realtimeDTO.setTemperature(255);
+        realtimeDTO.setHumidity(708);
+        realtimeDTO.setPrecipitation(0);
+        realtimeDTO.setWindSpeed(15);
+        realtimeDTO.setStatus("Clear");
+
+        fullWeatherDTO.getListHourlyWeather().add(hourlyWeather1);
+        fullWeatherDTO.getListDailyWeather().add(dailyWeather1);
+        fullWeatherDTO.setRealtimeWeather(realtimeDTO);
+        String requestBody = objectMapper.writeValueAsString(fullWeatherDTO);
+
+        LocationNotFoundException ex = new LocationNotFoundException("Location not found with given code");
+        when(fullWeatherService.update(Mockito.eq(locationCode), Mockito.any())).thenThrow(ex);
+
+        mockMvc.perform(get(END_POINT_PATH + "/" + locationCode)
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andDo(print());
+    }
+
+    // test invalid hourly and daily
+    @Test
+    public void testUpdateByLocationCode_Return200OK() throws Exception {
+        Location location = new Location();
+        location.setCode("LOC001");
+        location.setCityName("Hanoi");
+        location.setRegionName("Red River Delta");
+        location.setCountryCode("VN");
+        location.setCountryName("Viet nam");
+        FullWeatherDTO fullWeatherDTO = new FullWeatherDTO();
+        HourlyWeatherDTO hourlyWeather1 = new HourlyWeatherDTO()
+                .hourOfDay(8)
+                .temperature(30).precipitation(50)
+                .status("Cloudy");
+        DailyWeatherDTO dailyWeather1 = new DailyWeatherDTO().minTemp(10)
+                .maxTemp(20).precipitation(30)
+                .status("Sunny").dayOfMonth(22).month(12);
+
+        RealtimeWeatherDTO realtimeDTO = new RealtimeWeatherDTO();
+        realtimeDTO.setTemperature(25);
+        realtimeDTO.setHumidity(78);
+        realtimeDTO.setPrecipitation(0);
+        realtimeDTO.setWindSpeed(15);
+        realtimeDTO.setStatus("Clear");
+
+        fullWeatherDTO.getListHourlyWeather().add(hourlyWeather1);
+        fullWeatherDTO.getListDailyWeather().add(dailyWeather1);
+        fullWeatherDTO.setRealtimeWeather(realtimeDTO);
+        String requestBody = objectMapper.writeValueAsString(fullWeatherDTO);
+
+        when(fullWeatherService.update(Mockito.eq(location.getCode()), Mockito.any())).thenReturn(location);
+
+        mockMvc.perform(get(END_POINT_PATH + "/" + location.getCode())
+                        .contentType(MediaType.APPLICATION_JSON).content(requestBody))
+                .andExpect(status().isOk())
                 .andDo(print());
     }
 }

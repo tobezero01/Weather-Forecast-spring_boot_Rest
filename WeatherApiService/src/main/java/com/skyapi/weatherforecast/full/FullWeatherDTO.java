@@ -6,6 +6,7 @@ import com.skyapi.weatherforecast.customFieldFilter.RealtimeWeatherFieldFilter;
 import com.skyapi.weatherforecast.daily.DailyWeatherDTO;
 import com.skyapi.weatherforecast.hourly.HourlyWeatherDTO;
 import com.skyapi.weatherforecast.realtime.RealtimeWeatherDTO;
+import jakarta.validation.Valid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class FullWeatherDTO {
     private String location;
 
     @JsonProperty("realtime_weather")
+    @Valid
     private RealtimeWeatherDTO realtimeWeather = new RealtimeWeatherDTO();
 
     @JsonProperty("hourly_forecast")
