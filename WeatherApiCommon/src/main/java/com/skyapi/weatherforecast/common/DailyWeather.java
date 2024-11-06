@@ -26,6 +26,7 @@ public class DailyWeather {
     private int precipitation;
 
     @Column(length = 50)
+    @JsonProperty("status")
     @Length(min = 3, max = 50, message = "Status must be between 3-50 characters")
     private String status;
 

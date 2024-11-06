@@ -9,7 +9,7 @@ public class DailyWeatherDTO {
 
     @JsonProperty("day_of_month")
     private int dayOfMonth;
-
+    @JsonProperty("month")
     private int month;
 
     @JsonProperty("min_temperature")
@@ -17,9 +17,10 @@ public class DailyWeatherDTO {
 
     @JsonProperty("max_temperature")
     private int maxTemp;
-
+    @JsonProperty("precipitation")
     private int precipitation;
 
+    @JsonProperty("status")
     private String status;
 
 

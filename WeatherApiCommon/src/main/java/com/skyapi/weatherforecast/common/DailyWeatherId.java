@@ -17,6 +17,7 @@ public class DailyWeatherId implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "location_code")
+    @JsonProperty("location")
     private Location location;
 
     public DailyWeatherId() {

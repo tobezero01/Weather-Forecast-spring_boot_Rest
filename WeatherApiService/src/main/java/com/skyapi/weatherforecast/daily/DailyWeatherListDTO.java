@@ -8,6 +8,7 @@ import java.util.List;
 
 public class DailyWeatherListDTO {
 
+    @JsonProperty("location")
     private String location;
 
     @JsonProperty("daily_forecast")

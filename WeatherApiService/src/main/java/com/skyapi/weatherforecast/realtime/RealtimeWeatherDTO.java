@@ -1,6 +1,7 @@
 package com.skyapi.weatherforecast.realtime;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.skyapi.weatherforecast.common.HourlyWeather;
 import com.skyapi.weatherforecast.hourly.HourlyWeatherDTO;
@@ -10,6 +11,7 @@ import java.util.Date;
 
 public class RealtimeWeatherDTO {
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String location;
 
     private int temperature;

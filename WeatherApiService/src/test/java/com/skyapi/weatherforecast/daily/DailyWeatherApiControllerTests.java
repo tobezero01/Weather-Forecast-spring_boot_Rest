@@ -1,12 +1,11 @@
 package com.skyapi.weatherforecast.daily;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.skyapi.weatherforecast.GeolocationService;
 import com.skyapi.weatherforecast.common.DailyWeather;
 import com.skyapi.weatherforecast.common.Location;
 import com.skyapi.weatherforecast.exception.GeolocationException;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
-import com.skyapi.weatherforecast.hourly.HourlyWeatherApiController;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,14 +15,11 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
-import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,8 +37,8 @@ public class DailyWeatherApiControllerTests {
     @MockBean
     private GeolocationService geolocationService;
 
-    @MockBean
-    private ModelMapper modelMapper;
+    @Autowired
+    ObjectMapper objectMapper;
 
     @Test
     public void testGetByIpAddress_return400_GeolocationException() throws Exception {
