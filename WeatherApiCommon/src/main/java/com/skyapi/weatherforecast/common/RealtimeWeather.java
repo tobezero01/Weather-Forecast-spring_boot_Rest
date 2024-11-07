@@ -22,14 +22,17 @@ public class RealtimeWeather {
 
     @NotNull
     @Range(min = -50, max = 50, message = "Temperature must be in the range of -50 to 50 Celsius degree")
+    @JsonProperty("temperature")
     private int temperature;
 
     @NotNull
     @Range(min = 0, max = 100, message = "Humidity must be in the range of 0 to 100 Percentage")
+    @JsonProperty("humidity")
     private int humidity;
 
     @NotNull
     @Range(min = 0, max = 100, message = "Precipitation must be in the range of 0 to 100 Percentage")
+    @JsonProperty("precipitation")
     private int precipitation;
 
     @NotNull

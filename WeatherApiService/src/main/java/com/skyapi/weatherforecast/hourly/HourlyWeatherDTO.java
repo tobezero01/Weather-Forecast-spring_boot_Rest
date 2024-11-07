@@ -15,11 +15,14 @@ public class HourlyWeatherDTO {
     @JsonProperty("hour_of_day")
     private int hourOfDay;
     @Range(min = -50, max = 50, message = "Temperature must be in the range of -50 to 50 Celsius degree")
+    @JsonProperty("temperature")
     private int temperature;
     @Range(min = 0, max = 100, message = "Precipitation must be in the range of 0 to 100 Percentage")
+    @JsonProperty("precipitation")
     private int precipitation;
 
     @Length(min = 3, max = 50, message = "Status must be between 3-50 characters")
+    @JsonProperty("status")
     private String status;
 
     public int getHourOfDay() {

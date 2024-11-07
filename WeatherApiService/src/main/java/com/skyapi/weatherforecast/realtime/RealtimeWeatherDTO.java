@@ -16,15 +16,16 @@ public class RealtimeWeatherDTO {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String location;
 
+    @JsonProperty("temperature")
     private int temperature;
-
+    @JsonProperty("humidity")
     private int humidity;
-
+    @JsonProperty("precipitation")
     private int precipitation;
 
     @JsonProperty("wind_speed")
     private int windSpeed;
-
+    @JsonProperty("status")
     private String status;
 
     @JsonProperty("last_updated")
