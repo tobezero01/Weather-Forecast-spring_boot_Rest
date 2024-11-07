@@ -2,11 +2,12 @@ package com.skyapi.weatherforecast.hourly;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.skyapi.weatherforecast.common.Location;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class HourlyWeatherListDTO {
+public class HourlyWeatherListDTO extends RepresentationModel<HourlyWeatherListDTO> {
     private String location;
 
     @JsonProperty("hourlyWeather") // Ensure JSON output matches expected path
