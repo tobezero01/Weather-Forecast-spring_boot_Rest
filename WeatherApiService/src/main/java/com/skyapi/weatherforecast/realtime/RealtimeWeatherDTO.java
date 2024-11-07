@@ -3,15 +3,14 @@ package com.skyapi.weatherforecast.realtime;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.skyapi.weatherforecast.common.HourlyWeather;
 import com.skyapi.weatherforecast.customFieldFilter.RealtimeWeatherFieldFilter;
-import com.skyapi.weatherforecast.hourly.HourlyWeatherDTO;
+import org.springframework.hateoas.RepresentationModel;
 
 
 import java.util.Date;
 
 @JsonInclude(value = JsonInclude.Include.CUSTOM, valueFilter = RealtimeWeatherFieldFilter.class)
-public class RealtimeWeatherDTO {
+public class RealtimeWeatherDTO extends RepresentationModel<RealtimeWeatherDTO> {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String location;

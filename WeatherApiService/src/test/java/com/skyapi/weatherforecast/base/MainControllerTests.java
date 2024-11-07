@@ -1,17 +1,9 @@
 package com.skyapi.weatherforecast.base;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.skyapi.weatherforecast.GeolocationService;
-import com.skyapi.weatherforecast.common.DailyWeather;
-import com.skyapi.weatherforecast.common.Location;
-import com.skyapi.weatherforecast.exception.GeolocationException;
-import com.skyapi.weatherforecast.exception.LocationNotFoundException;
+
 import org.junit.jupiter.api.Test;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;

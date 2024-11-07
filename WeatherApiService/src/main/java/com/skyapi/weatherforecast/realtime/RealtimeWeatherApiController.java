@@ -4,8 +4,11 @@ import com.skyapi.weatherforecast.CommonUtility;
 import com.skyapi.weatherforecast.GeolocationService;
 import com.skyapi.weatherforecast.common.Location;
 import com.skyapi.weatherforecast.common.RealtimeWeather;
+import com.skyapi.weatherforecast.daily.DailyWeatherApiController;
 import com.skyapi.weatherforecast.exception.GeolocationException;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
+import com.skyapi.weatherforecast.full.FullWeatherApiController;
+import com.skyapi.weatherforecast.hourly.HourlyWeatherApiController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -19,6 +22,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @Tag(name = "Realtime Weather", description = "API for retrieving and updating real-time weather data")
 @RestController
@@ -57,7 +61,7 @@ public class RealtimeWeatherApiController {
 
             RealtimeWeatherDTO dto = modelMapper.map(realtimeWeather, RealtimeWeatherDTO.class);
 
-            return ResponseEntity.ok(dto);
+            return ResponseEntity.ok(addLinksByIP(dto));
 
         } catch (GeolocationException e) {
             LOGGER.error(e.getMessage(), e);
@@ -83,7 +87,8 @@ public class RealtimeWeatherApiController {
     public ResponseEntity<?> getRealtimeWeatherByLocationCode(@PathVariable("code") String locationCode) {
         try {
             RealtimeWeather realtimeWeather = realtimeWeatherService.getByLocationCode(locationCode);
-            return ResponseEntity.ok(entity2DTO(realtimeWeather));
+            RealtimeWeatherDTO dto = entity2DTO(realtimeWeather);
+            return ResponseEntity.ok(addLinksByLocationCode(dto, locationCode));
         } catch (LocationNotFoundException e) {
             LOGGER.error(e.getMessage(), e);
             return ResponseEntity.notFound().build();
@@ -107,13 +112,14 @@ public class RealtimeWeatherApiController {
                     @ApiResponse(responseCode = "404", description = "Location not found")
             }
     )
-    @PutMapping("/{code}")
-    public ResponseEntity<?> updateRealtimeWeather(@PathVariable("code") String locationCode,
+    @PutMapping("/{locationCode}")
+    public ResponseEntity<?> updateRealtimeWeather(@PathVariable("locationCode") String locationCode,
                                                    @RequestBody @Valid RealtimeWeather realtimeWeatherInRequest) {
         realtimeWeatherInRequest.setLocationCode(locationCode);
         try {
             RealtimeWeather updatedRealtimeWeather = realtimeWeatherService.update(locationCode, realtimeWeatherInRequest);
-            return ResponseEntity.ok(entity2DTO(updatedRealtimeWeather));
+            RealtimeWeatherDTO dto = entity2DTO(updatedRealtimeWeather);
+            return ResponseEntity.ok(addLinksByLocationCode(dto, locationCode));
         } catch (LocationNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
@@ -121,5 +127,20 @@ public class RealtimeWeatherApiController {
 
     private RealtimeWeatherDTO entity2DTO(RealtimeWeather realtimeWeather) {
         return modelMapper.map(realtimeWeather, RealtimeWeatherDTO.class);
+    }
+
+    private RealtimeWeatherDTO addLinksByIP(RealtimeWeatherDTO dto) throws GeolocationException {
+        dto.add(linkTo(methodOn(RealtimeWeatherApiController.class).getRealtimeWeatherByIPAddress(null)).withSelfRel());
+        dto.add(linkTo(methodOn(HourlyWeatherApiController.class).listHourlyForecastByIPAddress(null)).withRel("hourly_forecast"));
+        dto.add(linkTo(methodOn(DailyWeatherApiController.class).listDailyForecastByIPAddress(null)).withRel("daily_forecast"));
+        dto.add(linkTo(methodOn(FullWeatherApiController.class).getFullWeatherByIPAddress(null)).withRel("full_weather"));
+        return dto;
+    }
+    private RealtimeWeatherDTO addLinksByLocationCode(RealtimeWeatherDTO dto, String locationCode) {
+        dto.add(linkTo(methodOn(RealtimeWeatherApiController.class).getRealtimeWeatherByLocationCode(locationCode)).withSelfRel());
+        dto.add(linkTo(methodOn(HourlyWeatherApiController.class).listHourlyForecastByLocationCode(locationCode, null)).withRel("hourly_forecast"));
+        dto.add(linkTo(methodOn(DailyWeatherApiController.class).listDailyForecastByLocationCode(locationCode)).withRel("daily_forecast"));
+        dto.add(linkTo(methodOn(FullWeatherApiController.class).getFullWeatherByLocationCode(locationCode)).withRel("full_weather"));
+        return dto;
     }
 }
