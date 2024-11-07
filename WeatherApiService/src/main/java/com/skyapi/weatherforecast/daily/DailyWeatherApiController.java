@@ -1,5 +1,11 @@
 package com.skyapi.weatherforecast.daily;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import com.skyapi.weatherforecast.CommonUtility;
 import com.skyapi.weatherforecast.GeolocationService;
 import com.skyapi.weatherforecast.common.DailyWeather;
@@ -38,6 +44,12 @@ public class DailyWeatherApiController {
         this.modelMapper = modelMapper;
     }
 
+    @Operation(summary = "Return daily weather information based on client's IP address", tags = { "Daily Forecast" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daily weather data for the location based on IP"),
+            @ApiResponse(responseCode = "204", description = "No forecast data available"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
     @GetMapping
     public ResponseEntity<?> listDailyForecastByIPAddress(HttpServletRequest request) throws GeolocationException {
         String ipAddress = CommonUtility.getIPAddress(request);
@@ -52,6 +64,12 @@ public class DailyWeatherApiController {
         return ResponseEntity.ok(listEntity2DTO(dailyWeathers));
     }
 
+    @Operation(summary = "Return daily weather forecast information for a specific location code", tags = { "Daily Forecast" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daily forecast data for the specified location"),
+            @ApiResponse(responseCode = "204", description = "No forecast data available"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
     @GetMapping("/{locationCode}")
     public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode) {
         List<DailyWeather> dailyWeathers = dailyWeatherService.getByLocationCode(locationCode);
@@ -62,7 +80,12 @@ public class DailyWeatherApiController {
 
         return ResponseEntity.ok(listEntity2DTO(dailyWeathers));
     }
-
+    @Operation(summary = "Update daily weather forecast information for a specific location by code", tags = { "Daily Forecast" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Daily forecast data updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request, invalid data provided"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
     @PutMapping("/{locationCode}")
     public ResponseEntity<?> updateDailyForecast(@PathVariable("locationCode") String locationCode,
                                                  @RequestBody @Valid List<DailyWeatherDTO> listDTO) throws BadRequestException {

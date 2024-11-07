@@ -7,11 +7,16 @@ import com.skyapi.weatherforecast.common.Location;
 import com.skyapi.weatherforecast.exception.BadRequestException;
 import com.skyapi.weatherforecast.exception.GeolocationException;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
+import com.skyapi.weatherforecast.realtime.RealtimeWeatherDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Repository;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,6 +40,17 @@ public class HourlyWeatherApiController {
         this.modelMapper = modelMapper;
     }
 
+
+    @Operation(
+            summary = "Return hourly weather forecast based on client's IP address",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Hourly forecast data",
+                            content = @Content(schema = @Schema(implementation = HourlyWeatherDTO.class))),
+                    @ApiResponse(responseCode = "204", description = "No forecast data available"),
+                    @ApiResponse(responseCode = "400", description = "Geolocation error"),
+                    @ApiResponse(responseCode = "404", description = "Location not found")
+            }
+    )
     @GetMapping
     public ResponseEntity<?> listHourlyForecastByIPAddress(HttpServletRequest request) {
         String ipAddress = CommonUtility.getIPAddress(request);
@@ -56,6 +72,18 @@ public class HourlyWeatherApiController {
         }
     }
 
+
+    @Operation(
+            summary = "Return hourly weather forecast by location code",
+            parameters = @Parameter(name = "locationCode", description = "Location code to fetch forecast", required = true),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Hourly forecast data",
+                            content = @Content(schema = @Schema(implementation = HourlyWeatherDTO.class))),
+                    @ApiResponse(responseCode = "204", description = "No forecast data available"),
+                    @ApiResponse(responseCode = "404", description = "Location not found"),
+                    @ApiResponse(responseCode = "400", description = "Invalid current hour format")
+            }
+    )
     @GetMapping("/{locationCode}")
     public ResponseEntity<?> listHourlyForecastByIPAddress(@PathVariable("locationCode") String locationCode,
                                                            HttpServletRequest request) {
@@ -75,6 +103,23 @@ public class HourlyWeatherApiController {
         }
     }
 
+
+
+    @Operation(
+            summary = "Update hourly weather forecast for a location",
+            parameters = @Parameter(name = "code", description = "Location code for forecast update", required = true),
+            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    description = "List of hourly weather data to be updated",
+                    required = true,
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = HourlyWeatherDTO.class))
+            ),
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Forecast updated successfully",
+                            content = @Content(schema = @Schema(implementation = HourlyWeatherDTO.class))),
+                    @ApiResponse(responseCode = "404", description = "Location not found"),
+                    @ApiResponse(responseCode = "400", description = "Invalid forecast data provided")
+            }
+    )
     @PutMapping("/{code}")
     public ResponseEntity<?> updateHourlyForecast(@PathVariable("code") String locationCode,
                                                   @RequestBody @Valid List<HourlyWeatherDTO> listDTO) throws BadRequestException {

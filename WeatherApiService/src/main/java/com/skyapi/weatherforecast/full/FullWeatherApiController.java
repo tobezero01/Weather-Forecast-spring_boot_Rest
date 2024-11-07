@@ -9,7 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/v1/full")
 public class FullWeatherApiController {
@@ -26,6 +31,12 @@ public class FullWeatherApiController {
         this.modelMapper = modelMapper;
     }
 
+    @Operation(summary = "Return full weather forecast information based on client's IP address", tags = { "Full Weather Forecast" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Full weather forecast data"),
+            @ApiResponse(responseCode = "204", description = "No forecast data available"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
     @GetMapping
     public ResponseEntity<?> getFullWeatherByIPAddress(HttpServletRequest request) throws GeolocationException {
         String ipAddress = CommonUtility.getIPAddress(request);
@@ -36,12 +47,24 @@ public class FullWeatherApiController {
         return ResponseEntity.ok(entity2DTO(locationInDB));
     }
 
+    @Operation(summary = "Return full weather forecast information for a specific location code", tags = { "Full Weather Forecast" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Full weather forecast data for the specified location"),
+            @ApiResponse(responseCode = "204", description = "No forecast data available"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
     @GetMapping("/{locationCode}")
     public ResponseEntity<?> getFullWeatherByLocationCode(@PathVariable("locationCode") String locationCode) {
         Location locationInDB = fullWeatherService.get(locationCode);
         return ResponseEntity.ok(entity2DTO(locationInDB));
     }
 
+    @Operation(summary = "Update full weather forecast information for a specific location by code", tags = { "Full Weather Forecast" })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Full weather forecast data updated successfully"),
+            @ApiResponse(responseCode = "400", description = "Bad request, invalid data provided"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
     @PutMapping("/{locationCode}")
     public ResponseEntity<?> updateFullWeatherByLocationCode(@PathVariable("locationCode") String locationCode ,
                                                              @RequestBody FullWeatherDTO dto) throws BadRequestException {
