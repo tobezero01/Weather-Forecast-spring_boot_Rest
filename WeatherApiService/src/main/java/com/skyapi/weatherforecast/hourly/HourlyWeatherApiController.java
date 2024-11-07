@@ -85,7 +85,7 @@ public class HourlyWeatherApiController {
             }
     )
     @GetMapping("/{locationCode}")
-    public ResponseEntity<?> listHourlyForecastByIPAddress(@PathVariable("locationCode") String locationCode,
+    public ResponseEntity<?> listHourlyForecastByLocationCode(@PathVariable("locationCode") String locationCode,
                                                            HttpServletRequest request) {
         try {
             int currentHour = Integer.parseInt(request.getHeader("X-Current-Hour"));
