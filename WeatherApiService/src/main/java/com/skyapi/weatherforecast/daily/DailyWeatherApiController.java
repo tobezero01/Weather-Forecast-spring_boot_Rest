@@ -1,9 +1,13 @@
 package com.skyapi.weatherforecast.daily;
 
+import com.skyapi.weatherforecast.full.FullWeatherApiController;
+import com.skyapi.weatherforecast.hourly.HourlyWeatherApiController;
+import com.skyapi.weatherforecast.realtime.RealtimeWeatherApiController;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.skyapi.weatherforecast.CommonUtility;
@@ -58,7 +62,8 @@ public class DailyWeatherApiController {
         if (dailyWeathers.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(listEntity2DTO(dailyWeathers));
+        DailyWeatherListDTO dto = listEntity2DTO(dailyWeathers);
+        return ResponseEntity.ok(addLinksByIP(dto));
     }
 
     @Operation(summary = "Return daily weather forecast information for a specific location code", tags = { "Daily Forecast" })
@@ -68,14 +73,14 @@ public class DailyWeatherApiController {
             @ApiResponse(responseCode = "404", description = "Location not found")
     })
     @GetMapping("/{locationCode}")
-    public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode) {
+    public ResponseEntity<?> listDailyForecastByLocationCode(@PathVariable("locationCode") String locationCode)  {
         List<DailyWeather> dailyWeathers = dailyWeatherService.getByLocationCode(locationCode);
 
         if (dailyWeathers.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-
-        return ResponseEntity.ok(listEntity2DTO(dailyWeathers));
+        DailyWeatherListDTO dto = listEntity2DTO(dailyWeathers);
+        return ResponseEntity.ok(addLinksByLocationCode(dto, locationCode));
     }
     @Operation(summary = "Update daily weather forecast information for a specific location by code", tags = { "Daily Forecast" })
     @ApiResponses(value = {
@@ -94,8 +99,9 @@ public class DailyWeatherApiController {
         List<DailyWeather> dailyWeatherList = listDTO2ListEntity(listDTO);
 
         List<DailyWeather> updatedForecast = dailyWeatherService.updateByLocationCode(locationCode, dailyWeatherList);
+        DailyWeatherListDTO dto = listEntity2DTO(updatedForecast);
+        return ResponseEntity.ok(addLinksByLocationCode(dto, locationCode));
 
-        return ResponseEntity.ok(listEntity2DTO(updatedForecast));
     }
 
     private DailyWeatherListDTO listEntity2DTO(List<DailyWeather> dailyForecast) {
@@ -120,5 +126,22 @@ public class DailyWeatherApiController {
         return list;
     }
 
+    private EntityModel<DailyWeatherListDTO> addLinksByIP(DailyWeatherListDTO dto) throws GeolocationException {
+        EntityModel<DailyWeatherListDTO> entityModel = EntityModel.of(dto);
+        entityModel.add(linkTo(methodOn(DailyWeatherApiController.class).listDailyForecastByIPAddress(null)).withSelfRel());
+        entityModel.add(linkTo(methodOn(HourlyWeatherApiController.class).listHourlyForecastByIPAddress(null)).withRel("hourly_forecast"));
+        entityModel.add(linkTo(methodOn(RealtimeWeatherApiController.class).getRealtimeWeatherByIPAddress(null)).withRel("realtime_weather"));
+        entityModel.add(linkTo(methodOn(FullWeatherApiController.class).getFullWeatherByIPAddress(null)).withRel("full_weather"));
+        return entityModel;
+    }
+
+    private EntityModel<DailyWeatherListDTO> addLinksByLocationCode(DailyWeatherListDTO dto, String locationCode)   {
+        EntityModel<DailyWeatherListDTO> entityModel = EntityModel.of(dto);
+        entityModel.add(linkTo(methodOn(DailyWeatherApiController.class).listDailyForecastByLocationCode(locationCode)).withSelfRel());
+        entityModel.add(linkTo(methodOn(HourlyWeatherApiController.class).listHourlyForecastByLocationCode(locationCode, null)).withRel("hourly_forecast"));
+        entityModel.add(linkTo(methodOn(RealtimeWeatherApiController.class).getRealtimeWeatherByLocationCode(locationCode)).withRel("realtime_weather"));
+        entityModel.add(linkTo(methodOn(FullWeatherApiController.class).getFullWeatherByLocationCode(locationCode)).withRel("full_weather"));
+        return entityModel;
+    }
 
 }
