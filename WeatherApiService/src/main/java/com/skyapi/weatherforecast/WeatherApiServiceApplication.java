@@ -60,7 +60,7 @@ public class WeatherApiServiceApplication {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-		//objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
+		objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
 
 		return objectMapper;
 	}

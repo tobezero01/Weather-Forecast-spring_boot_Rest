@@ -10,6 +10,9 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.PagedModel;
+import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +22,7 @@ import jakarta.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +30,7 @@ import java.util.Map;
 @RequestMapping("/v1/locations")
 @CrossOrigin(origins = "http://localhost:3000")
 @Tag(name = "Location", description = "API for managing locations")
+@Relation(collectionRelation = "locations")
 public class LocationApiController {
 
     private  LocationService locationService;
@@ -72,7 +77,7 @@ public class LocationApiController {
                                            @RequestParam(value = "size", required = false, defaultValue = "5")
                                                 @Min(value = 5) @Max(value = 20) Integer pageSize,
                                            @RequestParam(value = "sort", required = false, defaultValue = "code") String sortField) throws BadRequestException {
-        if (!propertyMap.containsKey(sortField)) {
+        if (!propertyMap.containsValue(sortField)) {
             throw new BadRequestException("Invalid sort field " + sortField);
         }
         Page<Location> page = locationService.listByPage(pageNum - 1, pageSize, sortField);
@@ -80,7 +85,18 @@ public class LocationApiController {
         if (locations.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(locations);
+        return ResponseEntity.ok(addPageMetadata(locations, page));
+    }
+
+    private CollectionModel<Location> addPageMetadata(List<Location> list, Page<Location> pageInfo) {
+        int pageSize = pageInfo.getSize();
+        int pageNum = pageInfo.getNumber() + 1;
+        long totalElements = pageInfo.getTotalElements();
+
+        PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(pageSize, pageNum, totalElements);
+        CollectionModel<Location> collectionModel = PagedModel.of(list, pageMetadata);
+
+        return collectionModel;
     }
 
     @Deprecated
