@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.domain.Page;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.hateoas.server.core.Relation;
 import org.springframework.http.HttpStatus;
@@ -74,8 +75,8 @@ public class LocationApiController {
     @GetMapping
     public ResponseEntity<?> listLocations(@RequestParam(value = "page", required = false, defaultValue = "1")
                                                @Min(value = 1) Integer pageNum,
-                                           @RequestParam(value = "size", required = false, defaultValue = "5")
-                                                @Min(value = 5) @Max(value = 20) Integer pageSize,
+                                           @RequestParam(value = "size", required = false, defaultValue = "3")
+                                                @Min(value = 3) @Max(value = 20) Integer pageSize,
                                            @RequestParam(value = "sort", required = false, defaultValue = "code") String sortField) throws BadRequestException {
         if (!propertyMap.containsValue(sortField)) {
             throw new BadRequestException("Invalid sort field " + sortField);
@@ -85,17 +86,36 @@ public class LocationApiController {
         if (locations.isEmpty()) {
             return ResponseEntity.noContent().build();
         }
-        return ResponseEntity.ok(addPageMetadata(locations, page));
+        return ResponseEntity.ok(addPageMetadataAndLink2Collection(locations, page, sortField));
     }
 
-    private CollectionModel<Location> addPageMetadata(List<Location> list, Page<Location> pageInfo) {
+    private CollectionModel<Location> addPageMetadataAndLink2Collection(List<Location> list, Page<Location> pageInfo ,
+                                                                        String sortField) throws BadRequestException {
+        // add self link to each individual item
+        for (Location location : list) {
+            location.add(linkTo(methodOn(LocationApiController.class).getLocationByCode(location.getCode())).withSelfRel());
+        }
+
         int pageSize = pageInfo.getSize();
         int pageNum = pageInfo.getNumber() + 1;
         long totalElements = pageInfo.getTotalElements();
+        int totalPage = pageInfo.getTotalPages();
 
         PagedModel.PageMetadata pageMetadata = new PagedModel.PageMetadata(pageSize, pageNum, totalElements);
         CollectionModel<Location> collectionModel = PagedModel.of(list, pageMetadata);
 
+        // add self link to collection
+        collectionModel.add(linkTo(methodOn(LocationApiController.class).listLocations(pageNum, pageSize, sortField)).withSelfRel());
+        if (pageNum > 1) {
+            collectionModel.add(linkTo(methodOn(LocationApiController.class)
+                    .listLocations(1, pageSize, sortField)).withRel(IanaLinkRelations.FIRST));
+            collectionModel.add(linkTo(methodOn(LocationApiController.class)
+                    .listLocations(pageNum - 1, pageSize, sortField)).withRel(IanaLinkRelations.PREV));
+        }
+        if (pageNum < totalPage) {
+            collectionModel.add(linkTo(methodOn(LocationApiController.class)
+                    .listLocations(totalPage, pageSize, sortField)).withRel(IanaLinkRelations.LAST));
+        }
         return collectionModel;
     }
 

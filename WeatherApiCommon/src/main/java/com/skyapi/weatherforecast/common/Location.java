@@ -3,17 +3,20 @@ package com.skyapi.weatherforecast.common;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "locations")
-public class Location {
+@JsonPropertyOrder({"code","country_code","country_name","city_name","region_name","enabled","_links"})
+public class Location extends RepresentationModel<Location>{
 
     @Id
     @Column(length = 12, nullable = false, unique = true)
