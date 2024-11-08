@@ -1,6 +1,7 @@
 package com.skyapi.weatherforecast.location;
 
 import com.skyapi.weatherforecast.common.Location;
+import com.skyapi.weatherforecast.exception.BadRequestException;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,13 +9,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 import jakarta.validation.Valid;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/v1/locations")
@@ -23,6 +29,14 @@ import java.util.List;
 public class LocationApiController {
 
     private  LocationService locationService;
+    private Map<String,String> propertyMap = Map.of(
+            "code", "code",
+            "city_name", "cityName",
+            "region_name", "regionName",
+            "country_code", "countryCode",
+            "country_name", "countryName",
+            "enabled", "enabled"
+    );
 
     public LocationApiController(LocationService locationService) {
         this.locationService = locationService;
@@ -53,6 +67,23 @@ public class LocationApiController {
             @ApiResponse(responseCode = "204", description = "No content available")
     })
     @GetMapping
+    public ResponseEntity<?> listLocations(@RequestParam(value = "page", required = false, defaultValue = "1")
+                                               @Min(value = 1) Integer pageNum,
+                                           @RequestParam(value = "size", required = false, defaultValue = "5")
+                                                @Min(value = 5) @Max(value = 20) Integer pageSize,
+                                           @RequestParam(value = "sort", required = false, defaultValue = "code") String sortField) throws BadRequestException {
+        if (!propertyMap.containsKey(sortField)) {
+            throw new BadRequestException("Invalid sort field " + sortField);
+        }
+        Page<Location> page = locationService.listByPage(pageNum - 1, pageSize, sortField);
+        List<Location> locations = page.getContent();
+        if (locations.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(locations);
+    }
+
+    @Deprecated
     public ResponseEntity<?> listLocations() {
         List<Location> locations = locationService.list();
         if (locations.isEmpty()) {

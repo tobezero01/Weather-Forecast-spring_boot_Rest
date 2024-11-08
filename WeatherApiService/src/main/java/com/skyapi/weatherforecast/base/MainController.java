@@ -1,6 +1,7 @@
 package com.skyapi.weatherforecast.base;
 
 import com.skyapi.weatherforecast.daily.DailyWeatherApiController;
+import com.skyapi.weatherforecast.exception.BadRequestException;
 import com.skyapi.weatherforecast.exception.GeolocationException;
 import com.skyapi.weatherforecast.full.FullWeatherApiController;
 import com.skyapi.weatherforecast.hourly.HourlyWeatherApiController;
@@ -16,14 +17,14 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 public class MainController {
 
     @GetMapping("/")
-    public ResponseEntity<RootEntity> handleBaseURI() throws GeolocationException {
+    public ResponseEntity<RootEntity> handleBaseURI() throws GeolocationException, BadRequestException {
         return ResponseEntity.ok(createRootEntity());
     }
 
-    private RootEntity createRootEntity() throws GeolocationException {
+    private RootEntity createRootEntity() throws GeolocationException, BadRequestException {
         RootEntity entity = new RootEntity();
 
-        String locationUrl = linkTo(methodOn(LocationApiController.class).listLocations()).toString();
+        String locationUrl = linkTo(methodOn(LocationApiController.class).listLocations(null, null, null)).toString();
         String locationByCodeUrl = linkTo(methodOn(LocationApiController.class).getLocationByCode(null)).toString();
         String realtimeWeatherByIpUrl = linkTo(methodOn(RealtimeWeatherApiController.class).getRealtimeWeatherByIPAddress(null)).toString();
         String realtimeWeatherByCodeUrl = linkTo(methodOn(RealtimeWeatherApiController.class).getRealtimeWeatherByLocationCode(null)).toString();

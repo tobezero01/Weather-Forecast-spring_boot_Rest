@@ -2,6 +2,10 @@ package com.skyapi.weatherforecast.location;
 
 import com.skyapi.weatherforecast.common.Location;
 import com.skyapi.weatherforecast.exception.LocationNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +27,17 @@ public class LocationService {
     public boolean existsByCode(String code) {
         return locationRepository.existsById(code); // Hoặc sử dụng cách khác để kiểm tra mã địa điểm
     }
+
+    @Deprecated
     public List<Location> list() {
         return locationRepository.findUnTrashed();
+    }
+
+    public Page<Location> listByPage(int pageNum, int pageSize, String sortField) {
+        Sort sort = Sort.by(sortField).ascending();
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+
+        return locationRepository.findUnTrashed(pageable);
     }
 
     public Location get(String code) {

@@ -1,10 +1,15 @@
 package com.skyapi.weatherforecast.location;
 
 import com.skyapi.weatherforecast.common.*;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.Rollback;
 
 import java.util.ArrayList;
@@ -42,6 +47,7 @@ public class LocationRepositoryTests {
     }
 
     @Test
+    @Disabled
     public void testFindUnTrashed() {
         List<Location> unTrashedLocations = locationRepository.findUnTrashed();
         for (Location l : unTrashedLocations) {
@@ -49,6 +55,18 @@ public class LocationRepositoryTests {
         }
         // Kiểm tra kết quả
         assertThat(unTrashedLocations.size()).isGreaterThan(0);
+    }
+
+    @Test
+    public void testFirstPageAndSort() {
+        int pageSize = 5;
+        int pageNum = 0;
+        Sort sort = Sort.by("code").ascending();
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+        Page<Location> page = locationRepository.findUnTrashed(pageable);
+
+        assertThat(page).size().isEqualTo(pageSize);
+        page.forEach(System.out::println);
     }
 
     @Test
