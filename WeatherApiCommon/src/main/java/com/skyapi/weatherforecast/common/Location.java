@@ -33,7 +33,6 @@ public class Location extends RepresentationModel<Location>{
     @Column(length = 128)
     @NotNull(message = "Region name cannot be null")
     @Size(max = 128, message = "Region name cannot be longer than 128 characters")
-    @JsonProperty("region_name")
     private String regionName;
 
     @Column(length = 64, nullable = false)
@@ -45,7 +44,6 @@ public class Location extends RepresentationModel<Location>{
     @Column(length = 2, nullable = false)
     @NotBlank(message = "Country code is required and cannot be blank")
     @Size(min = 2, max = 3, message = "Country code must be exactly 2 or 3 characters")
-    @JsonProperty("country_code")
     private String countryCode;
 
     private boolean enabled;

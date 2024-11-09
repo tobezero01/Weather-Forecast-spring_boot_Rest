@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional
@@ -33,11 +34,21 @@ public class LocationService {
         return locationRepository.findUnTrashed();
     }
 
+    @Deprecated
     public Page<Location> listByPage(int pageNum, int pageSize, String sortField) {
         Sort sort = Sort.by(sortField).ascending();
+
         Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
 
         return locationRepository.findUnTrashed(pageable);
+    }
+
+    public Page<Location> listByPage(int pageNum, int pageSize, String sortField, Map<String, Object> filterFields) {
+        Sort sort = Sort.by(sortField).ascending();
+
+        Pageable pageable = PageRequest.of(pageNum, pageSize, sort);
+
+        return locationRepository.listWithFilter(pageable, filterFields);
     }
 
     public Location get(String code) {

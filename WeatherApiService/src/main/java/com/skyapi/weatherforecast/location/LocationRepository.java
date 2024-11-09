@@ -11,13 +11,14 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface LocationRepository extends JpaRepository<Location, String> {
+public interface LocationRepository extends JpaRepository<Location, String> , FilterableLocationRepository {
 
     @Query("SELECT l FROM Location l WHERE l.trashed = false")
     @Deprecated
     public List<Location> findUnTrashed();
 
     @Query("SELECT l FROM Location l WHERE l.trashed = false")
+    @Deprecated
     public Page<Location> findUnTrashed(Pageable pageable);
 
     @Query("SELECT l FROM Location l WHERE l.trashed = false AND l.code = ?1")

@@ -24,7 +24,7 @@ public class MainController {
     private RootEntity createRootEntity() throws GeolocationException, BadRequestException {
         RootEntity entity = new RootEntity();
 
-        String locationUrl = linkTo(methodOn(LocationApiController.class).listLocations(null, null, null)).toString();
+        String locationUrl = linkTo(methodOn(LocationApiController.class).listLocations(null, null, null, null, null, null)).toString();
         String locationByCodeUrl = linkTo(methodOn(LocationApiController.class).getLocationByCode(null)).toString();
         String realtimeWeatherByIpUrl = linkTo(methodOn(RealtimeWeatherApiController.class).getRealtimeWeatherByIPAddress(null)).toString();
         String realtimeWeatherByCodeUrl = linkTo(methodOn(RealtimeWeatherApiController.class).getRealtimeWeatherByLocationCode(null)).toString();
