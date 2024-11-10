@@ -11,16 +11,19 @@ import com.skyapi.weatherforecast.daily.DailyWeatherDTO;
 import com.skyapi.weatherforecast.full.FullWeatherDTO;
 import com.skyapi.weatherforecast.hourly.HourlyWeatherDTO;
 import com.skyapi.weatherforecast.realtime.RealtimeWeatherDTO;
+import com.skyapi.weatherforecast.security.RsaKeyProperties;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
 import java.util.Locale;
 
 @SpringBootApplication
+@EnableConfigurationProperties(RsaKeyProperties.class)
 public class WeatherApiServiceApplication {
 
 	public static void main(String[] args) {
