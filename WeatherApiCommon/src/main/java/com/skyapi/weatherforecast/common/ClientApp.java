@@ -1,6 +1,11 @@
 package com.skyapi.weatherforecast.common;
 
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Base64;
+import java.util.UUID;
 
 @Entity
 @Table(name = "client_apps")
@@ -38,6 +43,23 @@ public class ClientApp {
     private Location location;
 
     private boolean trashed;
+
+    @PrePersist
+    private void generateClientCredentials() {
+        // Kiểm tra và tạo clientId nếu chưa có
+        if (clientId == null || clientId.isEmpty()) {
+            this.clientId = UUID.randomUUID().toString().substring(0, 20);
+            System.out.println(clientId);
+        }
+
+        // Kiểm tra và tạo clientSecret nếu chưa có
+        if (clientSecret == null || clientSecret.isEmpty()) {
+            String rawSecret =  UUID.randomUUID().toString();
+            System.out.println(rawSecret);
+            this.clientSecret = rawSecret;
+        }
+    }
+
 
     public ClientApp() {
     }

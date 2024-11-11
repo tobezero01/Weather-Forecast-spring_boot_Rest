@@ -36,6 +36,12 @@ public class User {
     private List<ClientApp> listClientApp = new ArrayList<>();
 
     public User() {
+        this.setEnabled(true);
+    }
+
+    public User(Integer id) {
+        this.id = id;
+        this.setEnabled(true);
     }
 
     public Integer getId() {
