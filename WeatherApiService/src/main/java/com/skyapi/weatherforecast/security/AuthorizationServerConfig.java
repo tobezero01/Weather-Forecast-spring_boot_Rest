@@ -30,10 +30,8 @@ public class AuthorizationServerConfig {
     private int accessTokenExpirationTime;
 
     @Bean
-    @Order(1)
     public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
         OAuth2AuthorizationServerConfiguration.applyDefaultSecurity(http);
-        http.csrf(cs -> cs.disable());
         return http.build();
     }
 
