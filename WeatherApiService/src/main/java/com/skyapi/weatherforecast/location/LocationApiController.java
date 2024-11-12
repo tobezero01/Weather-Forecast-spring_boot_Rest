@@ -33,20 +33,18 @@ import java.util.*;
 public class LocationApiController {
 
     private  LocationService locationService;
-    private  Map<String, String> propertyMap;
+    Map<String, String> propertyMap = Map.of(
+            "code", "code",
+            "city_name", "cityName",
+            "region_name", "regionName",
+            "country_name", "countryName",
+            "country_code", "countryCode",
+            "enabled" , "enabled"
+    );;
 
-    public LocationApiController(LocationService locationService,
-                                 Map<String, String> propertyMap) {
+    public LocationApiController(LocationService locationService) {
         this.locationService = locationService;
-        propertyMap = Map.of(
-                "code", "code",
-                "city_name", "cityName",
-                "region_name", "regionName",
-                "country_name", "countryName",
-                "country_code", "countryCode",
-                "enabled" , "enabled"
-        );
-        this.propertyMap = propertyMap;
+
     }
 
     @Operation(summary = "Add a new location", description = "Create a new location if the code does not exist.")
@@ -86,15 +84,16 @@ public class LocationApiController {
         }
 
         Map<String, Object> filterFields = new HashMap<>();
-        if (!"".equals(enabled)) {
+        if (enabled != null && !enabled.isEmpty()) {
             filterFields.put("enabled", Boolean.parseBoolean(enabled));
         }
-        if (!"".equals(regionName)) {
+        if (regionName != null && !regionName.isEmpty()) {
             filterFields.put("regionName", regionName);
         }
-        if (!"".equals(countryCode)) {
+        if (countryCode != null && !countryCode.isEmpty()) {
             filterFields.put("countryCode", countryCode);
         }
+
 
         Page<Location> page = locationService.listByPage(pageNum - 1, pageSize, propertyMap.get(sortField), filterFields);
         List<Location> locations = page.getContent();
@@ -105,6 +104,7 @@ public class LocationApiController {
 
         return ResponseEntity.ok(addPageMetadataAndLink2Collection(locations, page, sortField, enabled, regionName, countryCode));
     }
+
 
 
     private CollectionModel<Location> addPageMetadataAndLink2Collection(List<Location> list, Page<Location> pageInfo ,
