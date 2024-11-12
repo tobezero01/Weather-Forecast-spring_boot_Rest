@@ -46,17 +46,22 @@ public class ClientApp {
 
     @PrePersist
     private void generateClientCredentials() {
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         // Kiểm tra và tạo clientId nếu chưa có
         if (clientId == null || clientId.isEmpty()) {
-            this.clientId = UUID.randomUUID().toString().substring(0, 20);
-            System.out.println(clientId);
+            // Tạo clientId ngẫu nhiên, loại bỏ dấu '-' và cắt chuỗi dài 20 ký tự
+            this.clientId = UUID.randomUUID().toString().replaceAll("-", "").substring(0, 20);
+            System.out.println("ClientId: " + clientId);
         }
 
         // Kiểm tra và tạo clientSecret nếu chưa có
         if (clientSecret == null || clientSecret.isEmpty()) {
-            String rawSecret =  UUID.randomUUID().toString();
-            System.out.println(rawSecret);
-            this.clientSecret = rawSecret;
+            // Tạo clientSecret ngẫu nhiên
+            String rawSecret = UUID.randomUUID().toString().replaceAll("-", "");
+            System.out.println("Raw clientSecret: " + rawSecret);
+
+            // Mã hóa clientSecret và lưu vào thuộc tính
+            this.clientSecret = passwordEncoder.encode(rawSecret);
         }
     }
 
