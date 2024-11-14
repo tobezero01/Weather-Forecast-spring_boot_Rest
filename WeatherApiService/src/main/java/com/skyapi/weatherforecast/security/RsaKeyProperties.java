@@ -1,13 +1,14 @@
 package com.skyapi.weatherforecast.security;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.security.KeyFactory;
-
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.PKCS8EncodedKeySpec;
@@ -17,6 +18,8 @@ import java.util.Base64;
 @Configuration
 @ConfigurationProperties(prefix = "rsa")
 public class RsaKeyProperties {
+
+    private static final Logger logger = LoggerFactory.getLogger(RsaKeyProperties.class);
 
     private Resource privateKey;
     private Resource publicKey;
@@ -31,12 +34,22 @@ public class RsaKeyProperties {
 
     @Bean
     public RSAPublicKey publicKey() throws Exception {
-        return loadPublicKey(publicKey);
+        try {
+            return loadPublicKey(publicKey);
+        } catch (Exception e) {
+            logger.error("Failed to load public key", e);
+            throw e;
+        }
     }
 
     @Bean
     public RSAPrivateKey privateKey() throws Exception {
-        return loadPrivateKey(privateKey);
+        try {
+            return loadPrivateKey(privateKey);
+        } catch (Exception e) {
+            logger.error("Failed to load private key", e);
+            throw e;
+        }
     }
 
     private RSAPublicKey loadPublicKey(Resource resource) throws Exception {
@@ -64,5 +77,4 @@ public class RsaKeyProperties {
             return (RSAPrivateKey) keyFactory.generatePrivate(spec);
         }
     }
-
 }
