@@ -17,6 +17,7 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
@@ -24,6 +25,7 @@ import java.util.Locale;
 
 @SpringBootApplication
 @EnableConfigurationProperties(RsaKeyProperties.class)
+@EntityScan({"com.skyapi.weatherforecast.common"})
 public class WeatherApiServiceApplication {
 
 	public static void main(String[] args) {

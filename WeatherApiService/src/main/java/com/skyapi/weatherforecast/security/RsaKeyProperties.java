@@ -53,16 +53,19 @@ public class RsaKeyProperties {
     }
 
     private RSAPublicKey loadPublicKey(Resource resource) throws Exception {
-        try (InputStream inputStream = resource.getInputStream()) {
-            String key = new String(inputStream.readAllBytes())
-                    .replace("-----BEGIN PUBLIC KEY-----", "")
-                    .replace("-----END PUBLIC KEY-----", "")
-                    .replaceAll("\\s", "");
-            byte[] keyBytes = Base64.getDecoder().decode(key);
-            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            return (RSAPublicKey) keyFactory.generatePublic(spec);
-        }
+
+        String key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwbiH+tI0YlKSLImxBTwv" +
+                "IoL/YPMSxVFFaT/JfAmfDCS6K/0JVSGANCsUMcZHEX4f7CMIvSLfrVLlwK19JK5H" +
+                "jbdauSBZtJuuGvRfnEMIRkMvzoSvP+CTyf/AdMVxI7ouZ2PHWOV28ADqPG5ZMwM6" +
+                "N+jZa2BAvtWH2AU5HS8WtIKjhw4nadrwrbVT2WPAtBobZxIicGsVAkdEvIH23KYA" +
+                "85hrlQtXFktZgA2nNpw47H/tGE7ZoDj9aRFQNmPO/nedZy9BvrdOP/9EOs4Fg32K" +
+                "5sPFPZueNcTi6PaVOrWa3t8qdG4lTcBjMtUY4ABm31aIOsC2z6klGEbCa9EgWzMY" +
+                "GQIDAQAB";
+        byte[] keyBytes = Base64.getDecoder().decode(key);
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+        KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+        return (RSAPublicKey) keyFactory.generatePublic(spec);
+
     }
 
     private RSAPrivateKey loadPrivateKey(Resource resource) throws Exception {

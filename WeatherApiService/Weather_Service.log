@@ -1,17 +1,6 @@
-2024-11-14T21:48:43.787+07:00  WARN 11704 --- [WeatherApiService] [restartedMain] ConfigServletWebServerApplicationContext : Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.support.BeanDefinitionOverrideException: Invalid bean definition with name 'jwtEncoder' defined in class path resource [com/skyapi/weatherforecast/security/JwtConfig.class]: Cannot register bean definition [Root bean: class [null]; scope=; abstract=false; lazyInit=null; autowireMode=3; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=jwtConfig; factoryMethodName=jwtEncoder; initMethodNames=null; destroyMethodNames=[(inferred)]; defined in class path resource [com/skyapi/weatherforecast/security/JwtConfig.class]] for bean 'jwtEncoder' since there is already [Root bean: class [null]; scope=; abstract=false; lazyInit=null; autowireMode=3; dependencyCheck=0; autowireCandidate=true; primary=false; factoryBeanName=authorizationServerConfig; factoryMethodName=jwtEncoder; initMethodNames=null; destroyMethodNames=[(inferred)]; defined in class path resource [com/skyapi/weatherforecast/security/AuthorizationServerConfig.class]] bound.
-2024-11-14T21:48:43.857+07:00 ERROR 11704 --- [WeatherApiService] [restartedMain] o.s.b.d.LoggingFailureAnalysisReporter   : 
-
-***************************
-APPLICATION FAILED TO START
-***************************
-
-Description:
-
-The bean 'jwtEncoder', defined in class path resource [com/skyapi/weatherforecast/security/JwtConfig.class], could not be registered. A bean with that name has already been defined in class path resource [com/skyapi/weatherforecast/security/AuthorizationServerConfig.class] and overriding is disabled.
-
-Action:
-
-Consider renaming one of the beans or enabling overriding by setting spring.main.allow-bean-definition-overriding=true
-
-2024-11-14T21:49:43.546+07:00  WARN 21496 --- [WeatherApiService] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2024-11-14T21:49:47.258+07:00  WARN 21496 --- [WeatherApiService] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-11-17T13:57:35.801+07:00  WARN 23740 --- [WeatherApiService] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-11-17T13:57:38.502+07:00  WARN 23740 --- [WeatherApiService] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-11-17T13:59:09.660+07:00  WARN 22960 --- [WeatherApiService] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-11-17T13:59:11.830+07:00  WARN 22960 --- [WeatherApiService] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2024-11-17T13:59:35.675+07:00  WARN 24164 --- [WeatherApiService] [restartedMain] org.hibernate.orm.deprecation            : HHH90000025: MySQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2024-11-17T13:59:39.106+07:00  WARN 24164 --- [WeatherApiService] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
